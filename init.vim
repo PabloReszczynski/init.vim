@@ -1,38 +1,52 @@
 set nocompatible
 filetype off
 " Plugins
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-Plugin 'VundleVim/Vundle.vim'               " Vundle
-Plugin 'scrooloose/nerdtree.git'            " NERD tree
-Plugin 'jiangmiao/auto-pairs.git'           " Auto pairs
-Plugin 'majutsushi/tagbar.git'              " Tagbar
-Plugin 'mattn/emmet-vim.git'                " Emmet
-Plugin 'chriskempson/base16-vim'            " base16 themes
-Plugin 'airblade/vim-gitgutter.git'         " Git
-Plugin 'vim-airline/vim-airline'            " Airline
-Plugin 'vim-airline/vim-airline-themes'     " Airline themes
-Plugin 'keith/tmux.vim'                     " TMUX
-Plugin 'PotatoesMaster/i3-vim-syntax'       " i3
-Plugin 'weynhamz/vim-plugin-minibufexpl'    " Top Buffers
-Plugin 'kien/ctrlp.vim'                     " Fuzzy Finder
-Plugin 'monokrome/vim-testdrive'            " Test Runner for Vim
-Plugin 'jgdavey/tslime.vim'                 " Send to tmux
-Plugin 'tpope/vim-dispatch'                 " Dispatch proceses
-Plugin 'sheerun/vim-polyglot'               " Syntax highlighting
-"Plugin 'vim-syntastic/syntastic'            " Syntastic
-Plugin 'ervandew/supertab'                  " Auto complete with Tab
-Plugin 'valloric/youcompleteme'             " YouCompleteMe
-Plugin 'rking/ag.vim'                       " Project Search
-Plugin 'Twinside/vim-haskellConceal'        " Haskell conceal
-call vundle#end()
+call plug#begin('~/.config/nvim/plugged')
+Plug 'junegunn/vim-plug'
+Plug 'scrooloose/nerdtree'                " NERD tree
+Plug 'scrooloose/nerdcommenter'           " NERD Commenter <leader>cc
+Plug 'jiangmiao/auto-pairs'               " Auto pairs
+Plug 'majutsushi/tagbar'                  " Tagbar
+Plug 'mattn/emmet-vim'                    " Emmet
+Plug 'chriskempson/base16-vim'            " base16 themes
+Plug 'airblade/vim-gitgutter'             " Git +-
+Plug 'vim-airline/vim-airline'            " Airline
+Plug 'vim-airline/vim-airline-themes'     " Airline themes
+Plug 'keith/tmux.vim'                     " TMUX
+Plug 'PotatoesMaster/i3-vim-syntax'       " i3
+Plug 'kien/ctrlp.vim'                     " Fuzzy Finder
+Plug 'monokrome/vim-testdrive'            " Test Runner for Vim
+Plug 'jgdavey/tslime.vim'                 " Send to tmux
+Plug 'tpope/vim-dispatch'                 " Dispatch proceses
+Plug 'tpope/vim-fugitive'                 " Git support
+Plug 'sheerun/vim-polyglot'               " Syntax highlighting
+Plug 'ervandew/supertab'                  " Auto complete with Tab
+Plug 'rking/ag.vim'                       " Project Search
+Plug 'Twinside/vim-haskellConceal'        " Haskell conceal
+Plug 'eagletmt/neco-ghc'                  " Haskell autocomplete
+Plug 'xolox/vim-notes'                    " Take notes in vim
+Plug 'xolox/vim-misc'                     " Dependency of vim-notes
+Plug 'kien/rainbow_parentheses.vim'       " Rainbow parens for lisp
+" Only NeoVim
+Plug 'Shougo/deoplete.nvim'               " Asynchronous autocomplete
+Plug 'zchee/deoplete-jedi'                " Async Python autocomplete
+Plug 'neomake/neomake'                    " Like Syntastic
+call plug#end()
 filetype plugin indent on
+
+" PATH
+let $PATH = $PATH . ':' . expand('~/.cabal/bin')
 
 " NVIM
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 
 " Comma is leader key
 let mapleader = ","
+
+" Deoplete
+let g:deoplete#enable_at_startup=1
+let g:deoplete#sources={}
+let g:deoplete#sources._=['buffer', 'tag', 'file']
 
 " timeout
 set ttimeout
@@ -76,14 +90,17 @@ set background=dark
 set termguicolors
 let base16colorspace=256
 let t_Co=256
-let g:airline_theme='base16_twilight'
-colorscheme base16-twilight
+let g:airline_theme='base16'
+colorscheme base16-nord
+
+highlight Comment cterm=italic term=italic
 
 " Airline
-let g:airline_powerline_fonts=1
+let g:airline_powerline_fonts=0
 let g:airline#extensions#branch#enabled=1
 "let g:airline_enable_syntastic=1
 let g:airline#extensions#tabline#enabled=0
+let g:airline#extensions#tabline#enabled=1
 
 " Search
 set incsearch
@@ -220,7 +237,7 @@ set guioptions-=T "remove tool bar
 set guioptions-=r "remove scroll bar
 set guioptions-=L "remove left scroll bar
 
-set guifont=Hack
+set guifont=Hack\ Regular:h10
 
 " PyRun
 function! Python_Eval_VSplit() range
@@ -243,6 +260,7 @@ au BufNewFile, BufRead *.py
 \ set fileformat=unix
 \ set colorcolumn=80
 let python_highlight_all=1
+let g:deoplete#enable_at_startup = 1
 
 " Spell Checking
 autocmd FileType tex,latex,md,txt setlocal spelllang=es_es spell
@@ -261,18 +279,22 @@ let g:javascript_conceal_underscore_arrow_function = "🞅"
 highlight Conceal ctermbg=black ctermfg=cyan
 
 " YouCompleteMe
-"let g:ycm_confirm_extra_conf = 0
-"let g:ycm_semantic_triggers = {'haskell' : ['.']}
+let g:ycm_confirm_extra_conf = 0
+let g:ycm_global_ycm_extra_conf = "~/.config/nvim/.ycm_extra_conf.py"
+let g:ycm_semantic_triggers = {'haskell' : ['.']}
 
 " Racket
 autocmd filetype lisp,scheme,art setlocal equalprg=~/scmindent.rkt
-"let g:syntastic_always_populate_loc_list = 1
-"let g:syntastic_auto_loc_list = 1
-"let g:syntastic_check_on_open = 0
-"let g:syntastic_check_on_wq = 1
 
-" Thyme
-nmap <leader>t :!thyme -d<cr>
+" Clojure
+map <leader>ar  :AcidRequire<CR>
+map <leader>agd :AcidGoToDefinition<CR>
+
+" Notes
+let g:notes_directories = ['~/Documents/Notes']
+let g:notes_suffix = '.txt'
+let g:notes_title_sync = 'rename_file'
+
 " Startup
 "autocmd VimEnter * NERDTree
 autocmd VimEnter * wincmd p
