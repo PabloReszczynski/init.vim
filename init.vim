@@ -3,14 +3,15 @@ filetype off
 " Plugins
 call plug#begin('~/.config/nvim/plugged')
 Plug 'junegunn/vim-plug'
+Plug 'junegunn/goyo.vim'                  " Distraction free
+Plug 'junegunn/limelight.vim'             " ditto
 Plug 'scrooloose/nerdtree'                " NERD tree
 Plug 'scrooloose/nerdcommenter'           " NERD Commenter <leader>cc
-"Plug 'tpope/vim-surround'                 " Surround parens
 Plug 'Townk/vim-autoclose'                " Auto pairs
 Plug 'majutsushi/tagbar'                  " Tagbar
 Plug 'mhinz/vim-startify'                 " Start screen
 Plug 'mattn/emmet-vim'                    " Emmet
-Plug 'chriskempson/base16-vim'
+Plug 'chriskempson/base16-vim'            " Color themes
 Plug 'airblade/vim-gitgutter'             " Git +-
 Plug 'vim-airline/vim-airline'            " Airline
 Plug 'vim-airline/vim-airline-themes'     " Airline themes
@@ -20,32 +21,49 @@ Plug 'edkolev/tmuxline.vim'               " TMUX line
 "Plug 'jgdavey/tslime.vim'                 " Send to tmux
 Plug 'sheerun/vim-polyglot'               " Syntax highlighting
 Plug 'justinmk/vim-syntax-extra'          " More Syntax highlighting
+Plug 'justinmk/vim-sneak'                 " Motions
 Plug 'ervandew/supertab'                  " Auto complete with Tab
-Plug 'rking/ag.vim'                       " Project Search
-Plug 'eagletmt/neco-ghc'                  " Haskell autocomplete
+"Plug 'eagletmt/neco-ghc'                  " Haskell autocomplete
 Plug 'eraserhd/parinfer-rust'             " Lisp Parinfer
 Plug 'kien/rainbow_parentheses.vim'       " Rainbow parens
 Plug 'Chiel92/vim-autoformat'             " Auto Formatting
+Plug 'tpope/vim-surround'                 " Surround parens
 Plug 'tpope/vim-fireplace'                " Clojure
-Plug 'guns/vim-clojure-static'            " Clojure syntax
-Plug 'guns/vim-clojure-highlight'         " Clojure syntax + fireplace
+Plug 'tpope/vim-endwise'                  " highlight matching blocks
 Plug 'tpope/vim-unimpaired'               " Bracket mappings
 Plug 'tpope/vim-commentary'               " comment with 'gc'
-Plug 'junegunn/goyo.vim'                  " Distraction free
-Plug 'junegunn/limelight.vim'             " ditto
+Plug 'tpope/vim-fugitive'                 " Git
+Plug 'tpope/vim-repeat'                   " Repeat last command
+Plug 'tpope/vim-dadbod'                   " Database interface
+Plug 'tpope/vim-eunuch'                   " Unix commands
+Plug 'guns/vim-clojure-static'            " Clojure syntax
+Plug 'guns/vim-clojure-highlight'         " Clojure syntax + fireplace
 Plug 'morhetz/gruvbox'                    " Gruvbox colorscheme
+Plug 'arcticicestudio/nord-vim'           " Nord colorscheme
+Plug 'andymass/vim-matchup'               " Match blocks
+Plug 'terryma/vim-smooth-scroll'          " Smooth scrolling
 " Only NeoVim and Vim8
 if has("nvim") || (v:version >= 800)
-Plug 'Shougo/deoplete.nvim'               " Asynchronous autocomplete
-Plug 'Shougo/neoinclude.vim'              " Autocomplete header files
-Plug 'Shougo/context_filetype.vim'        " Other file autocompletion
-Plug 'zchee/deoplete-jedi'                " Async Python autocomplete
-Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' } "JS
-Plug 'zchee/deoplete-clang'               " C, C++ autocompletion
-Plug 'w0rp/ale'                           " Lint
-Plug '/usr/local/opt/fzf'                 " Fuzzy finding
-Plug 'vim-pandoc/vim-pandoc'              " Markdown
-Plug 'vim-pandoc/vim-pandoc-syntax'       " Markdown syntax
+  Plug 'Shougo/deoplete.nvim'               " Asynchronous autocomplete
+  Plug 'Shougo/neoinclude.vim'              " Autocomplete header files
+  Plug 'zchee/deoplete-jedi'                " Async Python autocomplete
+  Plug 'numirias/semshi'                    " Python semantic highlight
+  Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' } "JS
+  Plug 'zchee/deoplete-clang'               " C, C++ autocompletion
+  " Plug 'Shougo/deoplete-lsp'                " Autocomplete lsp
+  Plug 'w0rp/ale'                           " Lint
+  Plug '/usr/local/opt/fzf'                 " Fuzzy finding filenames
+  Plug 'junegunn/fzf.vim'
+  Plug '/usr/local/opt/ripgrep'             " Better than ag
+  Plug 'vim-pandoc/vim-pandoc'              " Markdown
+  Plug 'vim-pandoc/vim-pandoc-syntax'       " Markdown syntax
+  Plug 'prabirshrestha/async.vim'           " Async plugins
+  " Plug 'prabirshrestha/vim-lsp'             " LSP
+  Plug 'roxma/nvim-yarp'                    " ?
+  Plug 'roxma/vim-hug-neovim-rpc'           " Experimental for deoplete in vim8
+  Plug 'brooth/far.vim'                     " Search and replace project-wide
+  " Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'} " LSP
+
 endif
 call plug#end()
 filetype plugin indent on
@@ -64,38 +82,35 @@ let mapleader = " "
 let g:startify_custom_header =
       \ map(split(system('todo.sh'), '\n'), '"   ". v:val')
 
+" Supertab
+let g:SuperTabDefaultCompletionType = "<c-n>"
+
+" Smooth Scrolling
+noremap <silent> <c-u> :call smooth_scroll#up(&scroll, 10, 2)<CR>
+noremap <silent> <c-d> :call smooth_scroll#down(&scroll, 10, 2)<CR>
+noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 10, 4)<CR>
+noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 10, 4)<CR>
+
 " Deoplete
 if has("nvim")
+  let g:ale_completion_enabled = 1
   let g:deoplete#enable_at_startup = 1
   let g:deoplete#enable_ignore_case = 1
   let g:deoplete#enable_smart_case = 1
   let g:context_filetype#same_filetypes = {}
   let g:context_filetype#same_filetypes._ = '_'
-  let g:deoplete#auto_complete_start_length = 1
-  "let g:deoplete#sources={}
-  "let g:deoplete#sources._=['buffer', 'tag', 'file']
-  "let g:tern#filetypes = ['jsx']
-  let g:deoplete#complete_method="complete"
-  "“ Map expression when a tab is hit:
-  "“           checks if the completion popup is visible
-  "“           if yes
-  "“               then it cycles to next item
-  "“           else
-  "“               if expandable_or_jumpable
-  "“                   then expands_or_jumps
-  "“                   else returns a normal TAB
-  imap <expr><TAB>
-        \ pumvisible() ? "\<C-n>" :
-        \ neosnippet#expandable_or_jumpable() ?
-        \    "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
-  smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-        \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
 
-  "“ Expands or completes the selected snippet/item in the popup menu
-  imap <expr><silent><CR> pumvisible() ? deoplete#mappings#close_popup() .
-        \ "\<Plug>(neosnippet_jump_or_expand)" : "\<CR>"
-  smap <silent><CR> <Plug>(neosnippet_jump_or_expand)
+  call deoplete#custom#option('sources', {
+        \ '_': ['ale'],
+        \})
 
+  call lsp#server#add('rust', ['rustup', 'run', 'nightly', 'rls'])
+  call lsp#server#add('python', 'pyls')
+  call lsp#server#add('typescript', {
+        \ 'name': 'ts',
+        \ 'callback': {
+        \ 'root_uri': { server -> RootFinderFromPlugin() }
+        \ }})
 endif
 
 " timeout
@@ -109,14 +124,16 @@ set foldlevel=99
 " mappings
 map <F2> :NERDTreeToggle<CR>
 map <F3> :TagbarToggle<CR>
-map <leader><tab> :b#<CR>
-map <leader>bb :FZF<CR>
+nnoremap <leader><tab> :b#<CR>
+nnoremap <leader>bb :Files<CR>
+nnoremap <leader>a :Ag<CR>
+nnoremap <leader>= :ALEFix<CR>
+nnoremap <leader>ft :NERDTreeToggle<CR>
+nnoremap <leader>n :ALENextWrap<CR>
+nnoremap <leader>N :ALEPreviousWrap<CR>
 
 " save session
 nnoremap <leader>s :mksession<CR>
-
-" open ag.vim
-nnoremap <leader>a :Ag
 
 " UI
 set nu
@@ -126,18 +143,32 @@ set wildmode=list:longest,full
 set showmatch
 set ruler
 set laststatus=2
+set noshowmode
 
-set background=dark
+set background=light
+let g:is_dark=1
+function! ToggleDark()
+  if g:is_dark
+    let g:is_dark = 0
+    set background=light
+  else
+    let g:is_dark = 1
+    set background=dark
+  endif
+endfunction
+nnoremap <leader>Tn :call ToggleDark()<CR>
 
 if has("nvim")
   set termguicolors
   let base16colorspace=256
   let t_Co=256
-  let g:airline_theme='base16'
+  let g:airline_theme='gruvbox'
 endif
 if has("gui_running")
   set guifont=Iosevka:h16
+  set macligatures
   let g:airline_theme='gruvbox'
+  autocmd! GUIEnter * set vb t_vb=
 endif
 let g:gruvbox_contrast_dark='hard'
 let g:gruvbox_contrast_light='soft'
@@ -147,7 +178,7 @@ highlight Comment cterm=italic term=italic
 set cursorline
 
 " Rainbow Parens
-if has("nvim")
+if (has("nvim") || (v:version >= 800)) && !has("gui_running")
   let g:rbpt_colorpairs = [
         \ ['red',       g:terminal_color_8],
         \ ['brown',     g:terminal_color_9],
@@ -189,7 +220,6 @@ let g:airline#extensions#tabline#fnamemod=':t'
 let g:airline#extensions#tabline#show_close_button=1
 let g:airline#extensions#ale#enabled=1
 
-
 " Search
 set incsearch
 set hlsearch
@@ -197,6 +227,10 @@ set ignorecase
 set smartcase
 " Turn off search highlight
 nnoremap <silent> // :noh<CR>
+
+" Sneak
+let g:sneak#label = 1
+let g:sneak#s_next = 1
 
 " Movement
 nnoremap j gj
@@ -225,12 +259,8 @@ let g:AutoPairsShortcutFastWrap='<C-e>'
 let NERDTreeIgnore = ['\.pyc$', '\.o$', '\.egg-info$', 'build$', 'dist$',
       \'__pycache__$']
 
-nmap <Leader><Space>o :lopen<CR>      " open location window
-nmap <Leader><Space>c :lclose<CR>     " close location window
-nmap <Leader><Space>, :ll<CR>         " go to current erro r/warning
-nmap <Leader><Space>n :lnext<CR>      " next error/warning
-nmap <Leader><Space>p :lprev<CR>      " previous error/warning
-
+let g:NERDTreeMapOpenSplit = "-"
+let g:NERDTreeMapOpenVSplit = "_"
 
 " Tmux
 let g:tmuxline_separators = {
@@ -380,20 +410,8 @@ au BufNewFile, BufRead *.sol
 autocmd FileType tex,latex,md,txt setlocal spelllang=es_es spell
 
 " Javascript
-" Concealing characters
-let g:javascript_conceal_function             = "λ"
-let g:javascript_conceal_null                 = "ø"
-let g:javascript_conceal_undefined            = "¿"
-let g:javascript_conceal_NaN                  = "ℕ"
-let g:javascript_conceal_arrow_function       = "🡺"
-let g:javascript_conceal_noarg_arrow_function = "🞅"
-let g:javascript_conceal_underscore_arrow_function = "🞅"
-
-let g:tigris#enabled = 1
-
-highlight Conceal ctermbg=black ctermfg=cyan
-
-let g:used_javascript_libs='ramda,jasmine,chai,react'
+let g:used_javascript_libs='ramda,jasmine,chai,react,mocha,jest'
+let g:javascript_plugin_flow=1
 
 " Racket
 autocmd filetype lisp,scheme,art setlocal equalprg=~/scmindent.rkt
@@ -410,3 +428,22 @@ if has("nvim")
   let g:deoplete#sources#clang#libclang_path = '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
   let g:deoplete#sources#clang#clang_header = '/Library/Developer/CommandLineTools/usr/lib/clang'
 endif
+
+" Rust
+let g:ale_rust_rls_toolchain='nightly'
+let g:ale_linters = {'rust': ['rls'], 'javascript': ['flow-language-server']}
+if executable('rls')
+  au User lsp_setup call lsp#register_server({
+        \ 'name': 'rls',
+        \ 'cmd': {server_info->['rustup', 'run', 'nightly', 'rls']},
+        \ 'workspace_config': {'rust': {'clippy_preference': 'on'}},
+        \ 'whitelist': ['rust'],
+        \ })
+endif
+let g:lsp_diagnostics_enabled = 0
+
+" ALE
+let g:ale_fixers = {
+      \ 'javascript': ['eslint', 'prettier'],
+      \ 'rust': ['rustfmt']
+  \}
