@@ -445,5 +445,7 @@ let g:lsp_diagnostics_enabled = 0
 " ALE
 let g:ale_fixers = {
       \ 'javascript': ['eslint', 'prettier'],
-      \ 'rust': ['rustfmt']
+      \ 'javascriptreact': ['eslint', 'prettier'],
+      \ 'rust': ['rustfmt'],
+      \ 'scala': ['scalafmt']
   \}
