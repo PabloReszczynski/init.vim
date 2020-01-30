@@ -7,6 +7,7 @@ Plug 'junegunn/goyo.vim'                  " Distraction free
 Plug 'junegunn/limelight.vim'             " ditto
 Plug 'scrooloose/nerdtree'                " NERD tree
 Plug 'scrooloose/nerdcommenter'           " NERD Commenter <leader>cc
+Plug 'Xuyuanp/nerdtree-git-plugin'        " NERD tree git plugin
 Plug 'Townk/vim-autoclose'                " Auto pairs
 Plug 'majutsushi/tagbar'                  " Tagbar
 Plug 'mhinz/vim-startify'                 " Start screen
@@ -18,15 +19,16 @@ Plug 'vim-airline/vim-airline-themes'     " Airline themes
 Plug 'keith/tmux.vim'                     " TMUX
 Plug 'edkolev/tmuxline.vim'               " TMUX line
 "Plug 'PotatoesMaster/i3-vim-syntax'       " i3
-"Plug 'jgdavey/tslime.vim'                 " Send to tmux
 Plug 'sheerun/vim-polyglot'               " Syntax highlighting
 Plug 'justinmk/vim-syntax-extra'          " More Syntax highlighting
 Plug 'justinmk/vim-sneak'                 " Motions
 Plug 'ervandew/supertab'                  " Auto complete with Tab
 "Plug 'eagletmt/neco-ghc'                  " Haskell autocomplete
 Plug 'eraserhd/parinfer-rust'             " Lisp Parinfer
+Plug 'guns/vim-sexp'                      " Lisp motions
 Plug 'kien/rainbow_parentheses.vim'       " Rainbow parens
 Plug 'Chiel92/vim-autoformat'             " Auto Formatting
+Plug 'tpope/vim-sexp-mappings-for-regular-people' " Lisp-sexp mappings
 Plug 'tpope/vim-surround'                 " Surround parens
 Plug 'tpope/vim-fireplace'                " Clojure
 Plug 'tpope/vim-endwise'                  " highlight matching blocks
@@ -36,21 +38,17 @@ Plug 'tpope/vim-fugitive'                 " Git
 Plug 'tpope/vim-repeat'                   " Repeat last command
 Plug 'tpope/vim-dadbod'                   " Database interface
 Plug 'tpope/vim-eunuch'                   " Unix commands
+Plug 'tpope/vim-vinegar'                  " File explorer
 Plug 'guns/vim-clojure-static'            " Clojure syntax
 Plug 'guns/vim-clojure-highlight'         " Clojure syntax + fireplace
 Plug 'morhetz/gruvbox'                    " Gruvbox colorscheme
 Plug 'arcticicestudio/nord-vim'           " Nord colorscheme
 Plug 'andymass/vim-matchup'               " Match blocks
 Plug 'terryma/vim-smooth-scroll'          " Smooth scrolling
+Plug 'tounaishouta/coq.vim'               " Coq proof assistant
 " Only NeoVim and Vim8
 if has("nvim") || (v:version >= 800)
   Plug 'Shougo/deoplete.nvim'               " Asynchronous autocomplete
-  Plug 'Shougo/neoinclude.vim'              " Autocomplete header files
-  Plug 'zchee/deoplete-jedi'                " Async Python autocomplete
-  Plug 'numirias/semshi'                    " Python semantic highlight
-  Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' } "JS
-  Plug 'zchee/deoplete-clang'               " C, C++ autocompletion
-  " Plug 'Shougo/deoplete-lsp'                " Autocomplete lsp
   Plug 'w0rp/ale'                           " Lint
   Plug '/usr/local/opt/fzf'                 " Fuzzy finding filenames
   Plug 'junegunn/fzf.vim'
@@ -58,12 +56,12 @@ if has("nvim") || (v:version >= 800)
   Plug 'vim-pandoc/vim-pandoc'              " Markdown
   Plug 'vim-pandoc/vim-pandoc-syntax'       " Markdown syntax
   Plug 'prabirshrestha/async.vim'           " Async plugins
-  " Plug 'prabirshrestha/vim-lsp'             " LSP
-  Plug 'roxma/nvim-yarp'                    " ?
-  Plug 'roxma/vim-hug-neovim-rpc'           " Experimental for deoplete in vim8
   Plug 'brooth/far.vim'                     " Search and replace project-wide
-  " Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'} " LSP
-
+  Plug 'machakann/vim-highlightedyank'      " Highlight yank
+  Plug 'l04m33/vlime', {'rtp': 'vim/'}      " Common Lisp
+endif
+if has('nvim')
+  Plug 'neovim/nvim-lsp' " Language server protocol configurations. Only neovim
 endif
 call plug#end()
 filetype plugin indent on
@@ -93,7 +91,7 @@ noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 10, 4)<CR>
 
 " Deoplete
 if has("nvim")
-  let g:ale_completion_enabled = 1
+  let g:ale_completion_enabled = 0
   let g:deoplete#enable_at_startup = 1
   let g:deoplete#enable_ignore_case = 1
   let g:deoplete#enable_smart_case = 1
@@ -101,21 +99,25 @@ if has("nvim")
   let g:context_filetype#same_filetypes._ = '_'
 
   call deoplete#custom#option('sources', {
-        \ '_': ['ale'],
-        \})
+    \ '_': ['ale'],
+  \})
 
-  call lsp#server#add('rust', ['rustup', 'run', 'nightly', 'rls'])
-  call lsp#server#add('python', 'pyls')
-  call lsp#server#add('typescript', {
-        \ 'name': 'ts',
-        \ 'callback': {
-        \ 'root_uri': { server -> RootFinderFromPlugin() }
-        \ }})
+  " call lsp#server#add('rust', ['rustup', 'run', 'nightly', 'rls'])
+  " call lsp#server#add('python', 'pyls')
+  " call lsp#server#add('typescript', {
+  "       \ 'name': 'ts',
+  "       \ 'callback': {
+  "       \   'root_uri': { server -> RootFinderFromPlugin() }
+  "       \ }})
+  " call lsp#server#add('javascriptreact', ['flow', 'lsp'])
 endif
 
 " timeout
 set ttimeout
 set ttimeoutlen=0
+
+" Update time
+set updatetime=100
 
 " Folding
 set foldmethod=indent
@@ -125,12 +127,16 @@ set foldlevel=99
 map <F2> :NERDTreeToggle<CR>
 map <F3> :TagbarToggle<CR>
 nnoremap <leader><tab> :b#<CR>
-nnoremap <leader>bb :Files<CR>
-nnoremap <leader>a :Ag<CR>
-nnoremap <leader>= :ALEFix<CR>
-nnoremap <leader>ft :NERDTreeToggle<CR>
-nnoremap <leader>n :ALENextWrap<CR>
-nnoremap <leader>N :ALEPreviousWrap<CR>
+nnoremap <silent> <leader>ff :Files<CR>
+nnoremap <silent> <leader>bb :Buffers<CR>
+nnoremap <silent> <leader>a :Ag<CR>
+nnoremap <silent> <leader>= :ALEFix<CR>
+nnoremap <silent> <leader>ft :NERDTreeToggle<CR>
+nnoremap <silent> <leader>n :ALENextWrap<CR>
+nnoremap <silent> <leader>N :ALEPreviousWrap<CR>
+nnoremap <silent> <leader>q :bd<CR>
+
+nnoremap <silent> <leader>gd :GitGutterLineHighlightsToggle<CR>
 
 " save session
 nnoremap <leader>s :mksession<CR>
@@ -144,9 +150,12 @@ set showmatch
 set ruler
 set laststatus=2
 set noshowmode
+if has('nvim')
+  set inccommand=nosplit
+endif
 
-set background=light
-let g:is_dark=1
+set background=dark
+let g:is_dark=0
 function! ToggleDark()
   if g:is_dark
     let g:is_dark = 0
@@ -165,7 +174,7 @@ if has("nvim")
   let g:airline_theme='gruvbox'
 endif
 if has("gui_running")
-  set guifont=Iosevka:h16
+  set guifont=Iosevka-Custom-Light:h13
   set macligatures
   let g:airline_theme='gruvbox'
   autocmd! GUIEnter * set vb t_vb=
@@ -203,8 +212,11 @@ set fillchars+=vert:\
 
 " Airline
 let g:airline_powerline_fonts=0
+let g:airline_section_c='%>%f'
 let g:airline#extensions#branch#enabled=1
 let g:airline#extensions#tabline#enabled=1
+let g:airline#extensions#fugitiveline#enabled=1
+let g:airline#extensions#hunks#enabled=0
 let g:airline#extensions#tabline#buffer_idx_mode=1
 nmap <leader>1 <Plug>AirlineSelectTab1
 nmap <leader>2 <Plug>AirlineSelectTab2
@@ -227,6 +239,9 @@ set ignorecase
 set smartcase
 " Turn off search highlight
 nnoremap <silent> // :noh<CR>
+
+" Ignore these files
+set wildignore+=*.zip,*.png,*.gif,*.pdf,*DS_Store*,*/.git/*,*/node_modules/*,yarn.lock
 
 " Sneak
 let g:sneak#label = 1
@@ -256,11 +271,22 @@ nnoremap <C-H> <C-W><C-H>
 let g:AutoPairsShortcutFastWrap='<C-e>'
 
 " NERDTree
-let NERDTreeIgnore = ['\.pyc$', '\.o$', '\.egg-info$', 'build$', 'dist$',
-      \'__pycache__$']
+let NERDTreeIgnore = [
+      \'\.pyc$',
+      \'\.o$',
+      \'\.egg-info$',
+      \'build$',
+      \'dist$',
+      \'__pycache__$',
+      \'.out$',
+      \'.aux$'
+      \]
 
 let g:NERDTreeMapOpenSplit = "-"
-let g:NERDTreeMapOpenVSplit = "_"
+let g:NERDTreeMapOpenVSplit = "v"
+let g:NERDTreeMinimalUI = 1
+let g:NERDTreeDirArrows = 1
+" let g:NERDTreeMapActivateNode = "l"
 
 " Tmux
 let g:tmuxline_separators = {
@@ -299,6 +325,7 @@ syntax on
 
 " Custom syntax
 au BufRead,BufNewFile *.build setfiletype python
+
 " Other
 set autoread
 if has('mouse')
@@ -309,6 +336,9 @@ set ffs=unix,dos,mac
 
 " When scrolling, keep cursor 3 lines away from screen border
 set scrolloff=3
+
+" Ctags executable
+let g:tagbar_ctags_bin = '/usr/local/Cellar/ctags/5.8_1/bin/ctags'
 
 " Remove trailing whitespace on save
 autocmd BufWritePre * :%s/\s\+$//e
@@ -417,21 +447,19 @@ let g:javascript_plugin_flow=1
 autocmd filetype lisp,scheme,art setlocal equalprg=~/scmindent.rkt
 
 " Clojure
-map <leader>ar  :AcidRequire<CR>
-map <leader>agd :AcidGoToDefinition<CR>
+map <leader>m' :FireplaceConnect<CR>
 
 " C
 let g:clighter_libclang_file = '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
 
 " Clang
-if has("nvim")
-  let g:deoplete#sources#clang#libclang_path = '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
-  let g:deoplete#sources#clang#clang_header = '/Library/Developer/CommandLineTools/usr/lib/clang'
-endif
+" if has("nvim")
+"   let g:deoplete#sources#clang#libclang_path = '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
+"   let g:deoplete#sources#clang#clang_header = '/Library/Developer/CommandLineTools/usr/lib/clang'
+" endif
 
 " Rust
 let g:ale_rust_rls_toolchain='nightly'
-let g:ale_linters = {'rust': ['rls'], 'javascript': ['flow-language-server']}
 if executable('rls')
   au User lsp_setup call lsp#register_server({
         \ 'name': 'rls',
@@ -440,12 +468,27 @@ if executable('rls')
         \ 'whitelist': ['rust'],
         \ })
 endif
-let g:lsp_diagnostics_enabled = 0
+let g:ale_rust_rls_config = { 'rust': { 'clippy_preference': 'on' } }
+let g:lsp_diagnostics_enabled = 1
+
+" Forth
+au BufNewFile, BufRead *.fs
+      \ set syntax=forth
 
 " ALE
 let g:ale_fixers = {
       \ 'javascript': ['eslint', 'prettier'],
       \ 'javascriptreact': ['eslint', 'prettier'],
       \ 'rust': ['rustfmt'],
-      \ 'scala': ['scalafmt']
+      \ 'scala': ['scalafmt'],
+      \ 'clojure': ['lein cljfmt fix']
   \}
+
+let g:ale_linters = {
+      \ 'rust': ['rls'],
+      \ 'javascript': ['flow', 'eslint', 'prettier'],
+      \ 'javascriptreact': ['flow', 'eslint', 'prettier'],
+      \ 'scala': ['metals-vim'],
+      \ 'sbt': ['metals-vim'],
+      \ 'clojure': ['clojure-lsp', 'joker', 'clj-kondo']
+      \ }
