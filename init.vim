@@ -8,29 +8,26 @@ Plug 'junegunn/limelight.vim'             " ditto
 Plug 'scrooloose/nerdtree'                " NERD tree
 Plug 'scrooloose/nerdcommenter'           " NERD Commenter <leader>cc
 Plug 'Xuyuanp/nerdtree-git-plugin'        " NERD tree git plugin
-Plug 'Townk/vim-autoclose'                " Auto pairs
-Plug 'majutsushi/tagbar'                  " Tagbar
+Plug 'liuchengxu/nerdtree-dash'           " NERD tree syntax highlight
+Plug 'jiangmiao/auto-pairs'               " Auto pair
 Plug 'mhinz/vim-startify'                 " Start screen
-Plug 'mattn/emmet-vim'                    " Emmet
-Plug 'chriskempson/base16-vim'            " Color themes
 Plug 'airblade/vim-gitgutter'             " Git +-
 Plug 'vim-airline/vim-airline'            " Airline
 Plug 'vim-airline/vim-airline-themes'     " Airline themes
 Plug 'keith/tmux.vim'                     " TMUX
 Plug 'edkolev/tmuxline.vim'               " TMUX line
-"Plug 'PotatoesMaster/i3-vim-syntax'       " i3
 Plug 'sheerun/vim-polyglot'               " Syntax highlighting
 Plug 'justinmk/vim-syntax-extra'          " More Syntax highlighting
 Plug 'justinmk/vim-sneak'                 " Motions
+Plug 'wellle/targets.vim'                 " More targets
 Plug 'ervandew/supertab'                  " Auto complete with Tab
-"Plug 'eagletmt/neco-ghc'                  " Haskell autocomplete
 Plug 'eraserhd/parinfer-rust'             " Lisp Parinfer
 Plug 'guns/vim-sexp'                      " Lisp motions
 Plug 'kien/rainbow_parentheses.vim'       " Rainbow parens
 Plug 'Chiel92/vim-autoformat'             " Auto Formatting
+Plug 'jpalardy/vim-slime'                 " Evaluate expressions
 Plug 'tpope/vim-sexp-mappings-for-regular-people' " Lisp-sexp mappings
 Plug 'tpope/vim-surround'                 " Surround parens
-Plug 'tpope/vim-fireplace'                " Clojure
 Plug 'tpope/vim-endwise'                  " highlight matching blocks
 Plug 'tpope/vim-unimpaired'               " Bracket mappings
 Plug 'tpope/vim-commentary'               " comment with 'gc'
@@ -39,17 +36,22 @@ Plug 'tpope/vim-repeat'                   " Repeat last command
 Plug 'tpope/vim-dadbod'                   " Database interface
 Plug 'tpope/vim-eunuch'                   " Unix commands
 Plug 'tpope/vim-vinegar'                  " File explorer
-Plug 'guns/vim-clojure-static'            " Clojure syntax
-Plug 'guns/vim-clojure-highlight'         " Clojure syntax + fireplace
+Plug 'guns/vim-clojure-static', { 'for': 'clojure' }          " Clojure syntax
+Plug 'liquidz/vim-iced',        { 'for': 'clojure' }          " CIDER interface
 Plug 'morhetz/gruvbox'                    " Gruvbox colorscheme
-Plug 'arcticicestudio/nord-vim'           " Nord colorscheme
+Plug 'chriskempson/base16-vim'            " Color themes
+Plug 'arcticicestudio/nord-vim'           " Nord theme
+Plug 'dracula/vim'                        " Dracula theme
 Plug 'andymass/vim-matchup'               " Match blocks
-Plug 'terryma/vim-smooth-scroll'          " Smooth scrolling
-Plug 'tounaishouta/coq.vim'               " Coq proof assistant
+Plug 'vimwiki/vimwiki'                    " Wiki on vim
+Plug 'vifm/vifm.vim'                      " File browser
+Plug 'Olical/aniseed'                     " Fennel neovim config
+Plug 'bakpakin/fennel.vim'                " Fennel syntax highlightning
 " Only NeoVim and Vim8
 if has("nvim") || (v:version >= 800)
   Plug 'Shougo/deoplete.nvim'               " Asynchronous autocomplete
-  Plug 'w0rp/ale'                           " Lint
+  Plug 'Shougo/deoplete-lsp'                " Autocomplete with LSP
+  " Plug 'w0rp/ale'                           " Lint
   Plug '/usr/local/opt/fzf'                 " Fuzzy finding filenames
   Plug 'junegunn/fzf.vim'
   Plug '/usr/local/opt/ripgrep'             " Better than ag
@@ -57,17 +59,22 @@ if has("nvim") || (v:version >= 800)
   Plug 'vim-pandoc/vim-pandoc-syntax'       " Markdown syntax
   Plug 'prabirshrestha/async.vim'           " Async plugins
   Plug 'brooth/far.vim'                     " Search and replace project-wide
-  Plug 'machakann/vim-highlightedyank'      " Highlight yank
   Plug 'l04m33/vlime', {'rtp': 'vim/'}      " Common Lisp
+  Plug 'liuchengxu/vista.vim'               " TagBar for LSP
 endif
 if has('nvim')
   Plug 'neovim/nvim-lsp' " Language server protocol configurations. Only neovim
+
+  nnoremap <leader> gd    <cmd>lua vim.lsp.buf.declaration()<CR>
+  nnoremap <silent> gd    <cmd>lua vim.lsp.buf.definition()<CR>
+  nnoremap <silent> K     <cmd>lua vim.lsp.buf.hover()<CR>
+  nnoremap <silent> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
+  nnoremap <silent> <c-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
+  nnoremap <silent> 1gD   <cmd>lua vim.lsp.buf.type_definition()<CR>
+  nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
 endif
 call plug#end()
 filetype plugin indent on
-
-" PATH
-let $PATH = $PATH . ':' . expand('~/.cabal/bin')
 
 " NVIM
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
@@ -75,6 +82,7 @@ let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 " Space is leader key
 nnoremap <Space> <Nop>
 let mapleader = " "
+let maplocalleader = " "
 
 " Startify
 let g:startify_custom_header =
@@ -83,34 +91,9 @@ let g:startify_custom_header =
 " Supertab
 let g:SuperTabDefaultCompletionType = "<c-n>"
 
-" Smooth Scrolling
-noremap <silent> <c-u> :call smooth_scroll#up(&scroll, 10, 2)<CR>
-noremap <silent> <c-d> :call smooth_scroll#down(&scroll, 10, 2)<CR>
-noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 10, 4)<CR>
-noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 10, 4)<CR>
-
-" Deoplete
-if has("nvim")
-  let g:ale_completion_enabled = 0
-  let g:deoplete#enable_at_startup = 1
-  let g:deoplete#enable_ignore_case = 1
-  let g:deoplete#enable_smart_case = 1
-  let g:context_filetype#same_filetypes = {}
-  let g:context_filetype#same_filetypes._ = '_'
-
-  call deoplete#custom#option('sources', {
-    \ '_': ['ale'],
-  \})
-
-  " call lsp#server#add('rust', ['rustup', 'run', 'nightly', 'rls'])
-  " call lsp#server#add('python', 'pyls')
-  " call lsp#server#add('typescript', {
-  "       \ 'name': 'ts',
-  "       \ 'callback': {
-  "       \   'root_uri': { server -> RootFinderFromPlugin() }
-  "       \ }})
-  " call lsp#server#add('javascriptreact', ['flow', 'lsp'])
-endif
+" Completion
+"call deoplete#custom#option('sources', { '_': ['ale'] })
+"let g:ale_completion_enabled = 1
 
 " timeout
 set ttimeout
@@ -125,24 +108,37 @@ set foldlevel=99
 
 " mappings
 map <F2> :NERDTreeToggle<CR>
-map <F3> :TagbarToggle<CR>
+map <F3> :Vista<CR>
 nnoremap <leader><tab> :b#<CR>
 nnoremap <silent> <leader>ff :Files<CR>
 nnoremap <silent> <leader>bb :Buffers<CR>
 nnoremap <silent> <leader>a :Ag<CR>
-nnoremap <silent> <leader>= :ALEFix<CR>
+" nnoremap <silent> <leader>= :ALEFix<CR>
+nnoremap <silent> <leader>= :Autoformat<CR>
 nnoremap <silent> <leader>ft :NERDTreeToggle<CR>
-nnoremap <silent> <leader>n :ALENextWrap<CR>
-nnoremap <silent> <leader>N :ALEPreviousWrap<CR>
+nnoremap <silent> <leader>fT :NERDTreeFind<CR>
+"nnoremap <silent> <leader>n :ALENextWrap<CR>
+"nnoremap <silent> <leader>N :ALEPreviousWrap<CR>
+"nnoremap <silent> gd :ALEGoToDefinition<CR>
+"nnoremap <silent> K :ALEHover<CR>
+"nnoremap <silent> gD :ALEGoToTypeDefinition<CR>
+"nnoremap <silent> gr :ALEFindReferences<CR>
 nnoremap <silent> <leader>q :bd<CR>
 
-nnoremap <silent> <leader>gd :GitGutterLineHighlightsToggle<CR>
+map <leader>h :wincmd h<CR>
+map <leader>j :wincmd j<CR>
+map <leader>k :wincmd k<CR>
+map <leader>l :wincmd l<CR>
+
+" nnoremap <silent> <leader>gd :GitGutterLineHighlightsToggle<CR>
 
 " save session
 nnoremap <leader>s :mksession<CR>
 
+inoremap jk <Esc>
+
 " UI
-set nu
+set relativenumber
 set showcmd
 set wildmenu
 set wildmode=list:longest,full
@@ -171,34 +167,20 @@ if has("nvim")
   set termguicolors
   let base16colorspace=256
   let t_Co=256
-  let g:airline_theme='gruvbox'
+  let g:airline_theme='dracula'
 endif
 if has("gui_running")
-  set guifont=Iosevka-Custom-Light:h13
+  set guifont=Pragmata\ Liga:h13
   set macligatures
   let g:airline_theme='gruvbox'
   autocmd! GUIEnter * set vb t_vb=
 endif
 let g:gruvbox_contrast_dark='hard'
 let g:gruvbox_contrast_light='soft'
-colorscheme gruvbox
+colorscheme dracula
 
 highlight Comment cterm=italic term=italic
 set cursorline
-
-" Rainbow Parens
-if (has("nvim") || (v:version >= 800)) && !has("gui_running")
-  let g:rbpt_colorpairs = [
-        \ ['red',       g:terminal_color_8],
-        \ ['brown',     g:terminal_color_9],
-        \ ['yellow',    g:terminal_color_10],
-        \ ['green',     g:terminal_color_11],
-        \ ['lightblue', g:terminal_color_12],
-        \ ['blue',      g:terminal_color_13],
-        \ ['magenta',   g:terminal_color_14],
-        \ ['brown',     g:terminal_color_15]
-        \ ]
-endif
 
 let g:rbpt_max = 8
 
@@ -211,13 +193,13 @@ autocmd Syntax   clojure RainbowParenthesesLoadBraces
 set fillchars+=vert:\
 
 " Airline
-let g:airline_powerline_fonts=0
-let g:airline_section_c='%>%f'
-let g:airline#extensions#branch#enabled=1
-let g:airline#extensions#tabline#enabled=1
-let g:airline#extensions#fugitiveline#enabled=1
-let g:airline#extensions#hunks#enabled=0
-let g:airline#extensions#tabline#buffer_idx_mode=1
+" let g:airline_powerline_fonts=0
+" let g:airline_section_c='%>%f'
+" let g:airline#extensions#branch#enabled=1
+" let g:airline#extensions#tabline#enabled=1
+" let g:airline#extensions#fugitiveline#enabled=1
+" let g:airline#extensions#hunks#enabled=0
+" let g:airline#extensions#tabline#buffer_idx_mode=1
 nmap <leader>1 <Plug>AirlineSelectTab1
 nmap <leader>2 <Plug>AirlineSelectTab2
 nmap <leader>3 <Plug>AirlineSelectTab3
@@ -227,14 +209,14 @@ nmap <leader>6 <Plug>AirlineSelectTab6
 nmap <leader>7 <Plug>AirlineSelectTab7
 nmap <leader>8 <Plug>AirlineSelectTab8
 nmap <leader>9 <Plug>AirlineSelectTab9
-let g:airline#extensions#tabline#show_tabs=1
-let g:airline#extensions#tabline#fnamemod=':t'
-let g:airline#extensions#tabline#show_close_button=1
-let g:airline#extensions#ale#enabled=1
+" let g:airline#extensions#tabline#show_tabs=1
+" let g:airline#extensions#tabline#fnamemod=':t'
+" let g:airline#extensions#tabline#show_close_button=1
+" let g:airline#extensions#ale#enabled=1
 
 " Search
 set incsearch
-set hlsearch
+set hlsearch is
 set ignorecase
 set smartcase
 " Turn off search highlight
@@ -257,6 +239,10 @@ nnoremap E $
 
 nnoremap $ <nop>
 nnoremap ^ <nop>
+
+" better indenting
+vnoremap < <gv
+vnoremap > >gv
 
 " Backspace
 set backspace=indent,eol,start
@@ -289,13 +275,13 @@ let g:NERDTreeDirArrows = 1
 " let g:NERDTreeMapActivateNode = "l"
 
 " Tmux
-let g:tmuxline_separators = {
-      \ 'left' : '',
-      \ 'left_alt': '|',
-      \ 'right' : '',
-      \ 'right_alt': '|',
-      \ 'space': ' '}
-"let g:tmuxline_theme = 'tomorrow'
+" let g:tmuxline_separators = {
+"       \ 'left' : '',
+"       \ 'left_alt': '|',
+"       \ 'right' : '',
+"       \ 'right_alt': '|',
+"       \ 'space': ' '}
+" let g:tmuxline_theme = 'gruvbox'
 " Repeat last command
 nnoremap <Leader>r: call <SID>TmuxRepeat()<CR>
 
@@ -378,6 +364,9 @@ function! NERDTreeQuit()
 endfunction
 autocmd WinEnter * call NERDTreeQuit()
 
+" Vista
+let g:vista_default_executive = 'nvim_lsp'
+
 " Minimal Vim
 function! Minimal()
   set showtabline=0
@@ -390,7 +379,7 @@ command! Minimal call Minimal()
 " Back to maximal vim
 function! Maximal()
   set list
-  set number
+  set relativenumber
   set showtabline=2
   set cursorline
   set colorcolumn=81
@@ -405,39 +394,11 @@ set guioptions-=T "remove tool bar
 set guioptions-=r "remove scroll bar
 set guioptions-=L "remove left scroll bar
 
-" PyRun
-function! Python_Eval_VSplit() range
-  let src = tempname()
-  let dst = tempname()
-  execute ": " . a:firstline . "," . a:lastline . "w " . src
-  execute ":!python3 " . src . " > " . dst
-  execute ":pedit! " . dst
-endfunction
-au BufNewFile,BufRead *.py vmap <F7> :call P
-
-" Python
-au BufNewFile, BufRead *.py
-      \ set tabstop=4
-      \ set softtabstop=4
-      \ set shiftwidth=4
-      \ set textwidth=79
-      \ set expandtab
-      \ set autoindent
-      \ set fileformat=unix
-      \ set colorcolumn=80
-let python_highlight_all=1
-
-" Solidity
-au BufNewFile, BufRead *.sol
-      \ set tabstop=4
-      \ set softtabstop=4
-      \ set shiftwidth=4
-      \ set expandtab
-      \ set autoindent
-      \ set fileformat=unix
+" Rust
+let g:rust_recommended_style=0
 
 " Spell Checking
-autocmd FileType tex,latex,md,txt setlocal spelllang=es_es spell
+autocmd Bufread, tex,latex,md,txt setlocal spelllang=es_es spell
 
 " Javascript
 let g:used_javascript_libs='ramda,jasmine,chai,react,mocha,jest'
@@ -446,49 +407,24 @@ let g:javascript_plugin_flow=1
 " Racket
 autocmd filetype lisp,scheme,art setlocal equalprg=~/scmindent.rkt
 
-" Clojure
-map <leader>m' :FireplaceConnect<CR>
+" ASDF projects
+autocmd BufNewFile,BufRead *.asd set ft=lisp
+
 
 " C
 let g:clighter_libclang_file = '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
 
-" Clang
-" if has("nvim")
-"   let g:deoplete#sources#clang#libclang_path = '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
-"   let g:deoplete#sources#clang#clang_header = '/Library/Developer/CommandLineTools/usr/lib/clang'
-" endif
-
-" Rust
-let g:ale_rust_rls_toolchain='nightly'
-if executable('rls')
-  au User lsp_setup call lsp#register_server({
-        \ 'name': 'rls',
-        \ 'cmd': {server_info->['rustup', 'run', 'nightly', 'rls']},
-        \ 'workspace_config': {'rust': {'clippy_preference': 'on'}},
-        \ 'whitelist': ['rust'],
-        \ })
-endif
-let g:ale_rust_rls_config = { 'rust': { 'clippy_preference': 'on' } }
-let g:lsp_diagnostics_enabled = 1
-
 " Forth
-au BufNewFile, BufRead *.fs
-      \ set syntax=forth
+au BufNewFile, BufRead *.fs set ft=forth
 
-" ALE
-let g:ale_fixers = {
-      \ 'javascript': ['eslint', 'prettier'],
-      \ 'javascriptreact': ['eslint', 'prettier'],
-      \ 'rust': ['rustfmt'],
-      \ 'scala': ['scalafmt'],
-      \ 'clojure': ['lein cljfmt fix']
-  \}
+" Slime
+let g:slime_target="tmux"
+let g:slime_default_config = {
+      \ "socket_name": "default",
+      \ "target_pane": "{right-of}"
+      \}
 
-let g:ale_linters = {
-      \ 'rust': ['rls'],
-      \ 'javascript': ['flow', 'eslint', 'prettier'],
-      \ 'javascriptreact': ['flow', 'eslint', 'prettier'],
-      \ 'scala': ['metals-vim'],
-      \ 'sbt': ['metals-vim'],
-      \ 'clojure': ['clojure-lsp', 'joker', 'clj-kondo']
-      \ }
+" Lua functions
+if has('nvim')
+  lua require('aniseed.dotfiles')
+endif
