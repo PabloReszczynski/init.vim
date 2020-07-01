@@ -7,15 +7,14 @@
 (defn- on-attach [_ bufnr]
   (nvim.buf_set_option bufnr "omnifunc" "v:lua.vim.lsp.omnifunc"))
 
-(def- lsp-servers ["tsserver" "vimls" "jsonls" "rls" "pyls"])
+(def- lsp-servers ["tsserver" "jsonls" "rls" "pyls"])
 
 (each [_ lsp (ipairs lsp-servers)]
   (let [lsp-setup (. nvim_lsp lsp)]
     (when lsp-setup
       (lsp-setup.setup {})))) ;; {:on_attach on-attach}))))
 
-(nvim_lsp.hie.setup { ;; :on_attach on-attach
-                     :languageServerHaskell
+(nvim_lsp.hls.setup {:languageServerHaskell
                      {:hlintOn true
                       :maxNumberOfProblems 10
                       :liquidOn: false

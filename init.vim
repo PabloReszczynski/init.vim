@@ -12,6 +12,7 @@ Plug 'liuchengxu/nerdtree-dash'           " NERD tree syntax highlight
 Plug 'jiangmiao/auto-pairs'               " Auto pair
 Plug 'mhinz/vim-startify'                 " Start screen
 Plug 'airblade/vim-gitgutter'             " Git +-
+Plug 'airblade/vim-rooter'                " Make project directory as root
 Plug 'vim-airline/vim-airline'            " Airline
 Plug 'vim-airline/vim-airline-themes'     " Airline themes
 Plug 'keith/tmux.vim'                     " TMUX
@@ -47,11 +48,14 @@ Plug 'vimwiki/vimwiki'                    " Wiki on vim
 Plug 'vifm/vifm.vim'                      " File browser
 Plug 'Olical/aniseed'                     " Fennel neovim config
 Plug 'bakpakin/fennel.vim'                " Fennel syntax highlightning
+Plug 'vim-scripts/quick-scope'            " Show motions
+Plug 'SirVer/ultisnips'                   " Snippet engine
+Plug 'honza/vim-snippets'                 " Snippets
 " Only NeoVim and Vim8
 if has("nvim") || (v:version >= 800)
   Plug 'Shougo/deoplete.nvim'               " Asynchronous autocomplete
   Plug 'Shougo/deoplete-lsp'                " Autocomplete with LSP
-  " Plug 'w0rp/ale'                           " Lint
+  Plug 'w0rp/ale'                           " Lint
   Plug '/usr/local/opt/fzf'                 " Fuzzy finding filenames
   Plug 'junegunn/fzf.vim'
   Plug '/usr/local/opt/ripgrep'             " Better than ag
@@ -61,6 +65,7 @@ if has("nvim") || (v:version >= 800)
   Plug 'brooth/far.vim'                     " Search and replace project-wide
   Plug 'l04m33/vlime', {'rtp': 'vim/'}      " Common Lisp
   Plug 'liuchengxu/vista.vim'               " TagBar for LSP
+  Plug 'APZelos/blamer.nvim'                " Git blame
 endif
 if has('nvim')
   Plug 'neovim/nvim-lsp' " Language server protocol configurations. Only neovim
@@ -112,18 +117,21 @@ map <F3> :Vista<CR>
 nnoremap <leader><tab> :b#<CR>
 nnoremap <silent> <leader>ff :Files<CR>
 nnoremap <silent> <leader>bb :Buffers<CR>
-nnoremap <silent> <leader>a :Ag<CR>
-" nnoremap <silent> <leader>= :ALEFix<CR>
-nnoremap <silent> <leader>= :Autoformat<CR>
+nnoremap <silent> <leader>aa :Rg<CR>
+nnoremap <silent> <leader>= :ALEFix<CR>
+"nnoremap <silent> <leader>= :Autoformat<CR>
 nnoremap <silent> <leader>ft :NERDTreeToggle<CR>
 nnoremap <silent> <leader>fT :NERDTreeFind<CR>
-"nnoremap <silent> <leader>n :ALENextWrap<CR>
-"nnoremap <silent> <leader>N :ALEPreviousWrap<CR>
+nnoremap <silent> <leader>n :ALENextWrap<CR>
+nnoremap <silent> <leader>N :ALEPreviousWrap<CR>
 "nnoremap <silent> gd :ALEGoToDefinition<CR>
 "nnoremap <silent> K :ALEHover<CR>
 "nnoremap <silent> gD :ALEGoToTypeDefinition<CR>
 "nnoremap <silent> gr :ALEFindReferences<CR>
 nnoremap <silent> <leader>q :bd<CR>
+vnoremap <silent> . :norm . <CR>
+nnoremap <C-s> :%s//g<Left><Left>
+nnoremap <leader>gs :G <CR>
 
 map <leader>h :wincmd h<CR>
 map <leader>j :wincmd j<CR>
@@ -167,7 +175,7 @@ if has("nvim")
   set termguicolors
   let base16colorspace=256
   let t_Co=256
-  let g:airline_theme='dracula'
+  let g:airline_theme='gruvbox'
 endif
 if has("gui_running")
   set guifont=Pragmata\ Liga:h13
@@ -177,7 +185,7 @@ if has("gui_running")
 endif
 let g:gruvbox_contrast_dark='hard'
 let g:gruvbox_contrast_light='soft'
-colorscheme dracula
+colorscheme gruvbox
 
 highlight Comment cterm=italic term=italic
 set cursorline
@@ -212,7 +220,7 @@ nmap <leader>9 <Plug>AirlineSelectTab9
 " let g:airline#extensions#tabline#show_tabs=1
 " let g:airline#extensions#tabline#fnamemod=':t'
 " let g:airline#extensions#tabline#show_close_button=1
-" let g:airline#extensions#ale#enabled=1
+let g:airline#extensions#ale#enabled=1
 
 " Search
 set incsearch
@@ -225,9 +233,16 @@ nnoremap <silent> // :noh<CR>
 " Ignore these files
 set wildignore+=*.zip,*.png,*.gif,*.pdf,*DS_Store*,*/.git/*,*/node_modules/*,yarn.lock
 
+" Quickscope
+let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
+let g:qs_first_occurrence_highlight_color='#fb4934'
+
 " Sneak
 let g:sneak#label = 1
 let g:sneak#s_next = 1
+let g:sneak#use_ic_scs = 1 "Case insensitive
+highlight Sneak guifg=black guibg=#00C7DF ctermfg=black ctermbg=cyan
+highlight SneakScope guifg=red guibg=yellow ctermfg=red ctermbg=yellow
 
 " Movement
 nnoremap j gj

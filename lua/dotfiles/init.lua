@@ -22,7 +22,7 @@ local _2_ = _1_(...)
 local core = _2_[1]
 local nvim = _2_[2]
 local nvim_lsp = _2_[3]
-do local _ = ({nil, _0_0, nil})[2] end
+do local _ = ({nil, _0_0, {{}, nil}})[2] end
 local on_attach = nil
 do
   local v_23_0_ = nil
@@ -35,7 +35,7 @@ do
 end
 local lsp_servers = nil
 do
-  local v_23_0_ = {"tsserver", "vimls", "jsonls", "rls", "pyls"}
+  local v_23_0_ = {"tsserver", "jsonls", "rls", "pyls"}
   _0_0["aniseed/locals"]["lsp-servers"] = v_23_0_
   lsp_servers = v_23_0_
 end
@@ -45,7 +45,7 @@ for _, lsp in ipairs(lsp_servers) do
     lsp_setup.setup({})
   end
 end
-nvim_lsp.hie.setup({languageServerHaskell = {["completionSnippetsOn:"] = true, ["formatOnImportOn:"] = true, ["formattingProvider:"] = "brittany", ["liquidOn:"] = false, hlintOn = true, maxNumberOfProblems = 10}})
+nvim_lsp.hls.setup({languageServerHaskell = {["completionSnippetsOn:"] = true, ["formatOnImportOn:"] = true, ["formattingProvider:"] = "brittany", ["liquidOn:"] = false, hlintOn = true, maxNumberOfProblems = 10}})
 nvim.g.ale_completion_enabled = 1
 nvim.g["deoplete#enable_at_startup"] = 1
 nvim.g["deoplete#enable_ignore_case"] = 1
