@@ -1,26 +1,19 @@
 (module dotfiles.init
   {require {core aniseed.core
             nvim aniseed.nvim
-            nvim_lsp "nvim_lsp"}})
+            nvim_lsp "nvim_lsp"
+            diagnostic "diagnostic"
+            treesitter-config "nvim-treesitter.configs"}})
 
 ;; LSP settings
-(defn- on-attach [_ bufnr]
-  (nvim.buf_set_option bufnr "omnifunc" "v:lua.vim.lsp.omnifunc"))
 
-(def- lsp-servers ["tsserver" "jsonls" "rls" "pyls"])
+(def- lsp-servers ["tsserver" "rls" "pyls" "dartls" "hls"])
 
 (each [_ lsp (ipairs lsp-servers)]
   (let [lsp-setup (. nvim_lsp lsp)]
     (when lsp-setup
-      (lsp-setup.setup {})))) ;; {:on_attach on-attach}))))
+      (lsp-setup.setup {:on_attach diagnostic.on_attach})))) ;; {:on_attach on-attach}))))
 
-(nvim_lsp.hls.setup {:languageServerHaskell
-                     {:hlintOn true
-                      :maxNumberOfProblems 10
-                      :liquidOn: false
-                      :completionSnippetsOn: true
-                      :formatOnImportOn: true
-                      :formattingProvider: "brittany"}})
 
 
 ;; Deoplete
@@ -106,7 +99,8 @@
 (set nvim.g.ale_fixers
      {:javascript ["eslint" "prettier"]
       :javacriptreact ["eslint" "prettier"]
-      :typescript ["eslint" "tslint" "prettier"]
+      :typescriptreact ["eslint" "tslint" "prettier"]
+      :typescript ["eslint" "tslint"]
       :json ["prettier"]
       :graphql ["prettier"]
       :rust ["rustfmt"]
@@ -114,22 +108,40 @@
       :clojure ["lein cljfmt fix"]
       :yaml ["prettier"]
       :haskell ["brittany"]
-      :python ["autopep8"]})
+      :python ["autopep8"]
+      :dart ["dartfmt"]
+      :tex ["latexindent"]})
 
 (set nvim.g.ale_linters
      {:rust ["rls" "clippy"]
-      :javascript ["flow" "eslint" "tslint" "prettier"]
+      :javascript ["flow" "eslint" "tslint"]
       :javascriptreact ["flow" "eslint" "prettier"]
+      :typescript ["tsserver"]
       :scala ["metals-vim"]
       :sbt ["metals-vim"]
       :clojure ["clj-kondo"]
       :haskell ["hie" "brittany" "liquid"]
       :vim ["vimls"]
       :json ["jsonls"]
-      :python ["pyls"]})
+      :python ["pyls"]
+      :dart ["dartanalyzer"]
+      :tex ["texlab"]})
 
 ; Slime
 (set nvim.g.slime_target "tmux")
 (set nvim.g.slime_default_config
      {:socket_name "default"
       :target_pane "{right-of}"})
+
+;; Treesitter
+(treesitter-config.setup
+  {:ensure_installed "maintained"
+   :highlight {:enable true}
+   :textobjects
+   {:move {:enable true
+           :goto_next_start     {["]m"] "@function.outer"}
+           :goto_next_end       {["]M"] "@function.outer"}
+           :goto_previous_start {["[m"] "@function.outer"}
+           :goto_previous_end   {["[M"] "@function.outer"}}
+    :lsp_interop {:enable true
+                  :peek_definition_code {["df"] "@function.outer"}}}})
