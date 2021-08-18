@@ -3,7 +3,7 @@ local nvim_lsp = require"lspconfig"
 local lsp_servers = {
   "tsserver",
   "rls",
-  "pyls",
+  "pylsp",
   "dartls",
   "hls",
   "jsonls",
@@ -22,9 +22,9 @@ for _, server in ipairs(lsp_servers) do
   }
 end
 
-local diagnosticls = require'diagnosticls-nvim'
-local eslint = require'diagnosticls-nvim.linters.eslint'
-local prettier = require'diagnosticls-nvim.formatters.prettier'
+local diagnosticls = require'diagnosticls-configs'
+local eslint = require'diagnosticls-configs.linters.eslint'
+local prettier = require'diagnosticls-configs.formatters.prettier'
 diagnosticls.init {
   on_attach = on_attach -- Your custom attach function
 }

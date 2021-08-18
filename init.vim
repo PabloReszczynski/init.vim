@@ -7,8 +7,8 @@ Plug 'scrooloose/nerdcommenter'           " NERD Commenter <leader>cc
 Plug 'jiangmiao/auto-pairs'               " Auto pair
 Plug 'mhinz/vim-startify'                 " Start screen
 Plug 'airblade/vim-rooter'                " Make project directory as root
-Plug 'keith/tmux.vim'                     " TMUX
-Plug 'edkolev/tmuxline.vim'               " TMUX line
+" Plug 'keith/tmux.vim'                     " TMUX
+" Plug 'edkolev/tmuxline.vim'               " TMUX line
 Plug 'sheerun/vim-polyglot'               " Syntax highlighting
 Plug 'justinmk/vim-syntax-extra'          " More Syntax highlighting
 Plug 'justinmk/vim-sneak'                 " Motions
@@ -45,10 +45,9 @@ Plug '/usr/local/opt/ripgrep'             " Better than ag
 Plug 'vim-pandoc/vim-pandoc'              " Markdown
 Plug 'vim-pandoc/vim-pandoc-syntax'       " Markdown syntax
 Plug 'prabirshrestha/async.vim'           " Async plugins
-Plug 'brooth/far.vim'                     " Search and replace project-wide
-Plug 'l04m33/vlime', {'rtp': 'vim/'}      " Common Lisp
 Plug 'APZelos/blamer.nvim'                " Git blame
 Plug 'vim-scripts/dbext.vim'              " Database access
+Plug 'Olical/conjure'                     " Clojure eval
 if has('nvim')
   Plug 'neovim/nvim-lspconfig' " Language server protocol configurations. Only neovim
   Plug 'hrsh7th/nvim-compe'                 " Autocomplete
@@ -64,7 +63,7 @@ if has('nvim')
   Plug 'hoob3rt/lualine.nvim'                " Lua statusline
   Plug 'kyazdani42/nvim-tree.lua'            " Tree viewer
   Plug 'kosayoda/nvim-lightbulb'             " Code action lightbulb emoji
-  Plug 'creativenull/diagnosticls-nvim'      " Diagnostics with linters and formatters
+  Plug 'creativenull/diagnosticls-configs-nvim'      " Diagnostics with linters and formatters
 
   " LSP config
   nnoremap <leader> gd        <cmd>lua vim.lsp.buf.declaration()<CR>
@@ -80,6 +79,7 @@ if has('nvim')
   " nnoremap <silent> <leader>N <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
   nnoremap <silent> <c-a>     <cmd>lua vim.lsp.buf.code_action()<CR>
   nnoremap <silent> <space>= <cmd>lua vim.lsp.buf.formatting_seq_sync()<CR>
+  nnoremap <silent> <C-c> <C-c> :ConjureEvalCurrentForm<CR>
 
   inoremap <silent><expr> <C-Space> compe#complete()
   inoremap <silent><expr> <C-k> pumvisible() ? "\<Up>" : "\<C-k>"
@@ -188,30 +188,13 @@ augroup END
 hi CursorLine cterm=underline term=underline
 
 set background=dark
-let g:is_dark=0
-function! ToggleDark()
-  if g:is_dark
-    let g:is_dark = 0
-    set background=light
-  else
-    let g:is_dark = 1
-    set background=dark
-  endif
-endfunction
-nnoremap <leader>Tn :call ToggleDark()<CR>
-
 highlight Comment cterm=italic term=italic
 if has("nvim")
   set termguicolors
-  let base16colorspace=256
-  let t_Co=256
-  "let g:airline_theme='dracula'
-  colorscheme dracula
 endif
-set guifont=PragmataPro\ Mono\ Liga:h16
+colorscheme dracula
 if has("gui_running")
-  colorscheme dracula
-  let g:airline_theme='dracula'
+  set guifont=PragmataPro\ Mono\ Liga:h16
   autocmd! GUIEnter * set vb t_vb=
 endif
 let g:gruvbox_contrast_dark='hard'
@@ -297,7 +280,7 @@ set smartindent
 " Column
 set textwidth=80
 set colorcolumn=81
-highlight ColorColumn ctermbg=darkgray
+hi ColorColumn ctermbg=DarkBlue
 
 " Path
 let &path.="src/include,/usr/include/AL,"
@@ -372,6 +355,5 @@ let g:opamshare=substitute(system('opam config var share'), '\n$', '', '''')
 
 " Lua functions
 if has('nvim')
-   "lua require('aniseed.env').init({ module = 'dotfiles.init' })
    lua require('init')
 endif
