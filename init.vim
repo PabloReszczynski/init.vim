@@ -9,8 +9,6 @@ Plug 'mhinz/vim-startify'                 " Start screen
 Plug 'airblade/vim-rooter'                " Make project directory as root
 " Plug 'keith/tmux.vim'                     " TMUX
 " Plug 'edkolev/tmuxline.vim'               " TMUX line
-Plug 'sheerun/vim-polyglot'               " Syntax highlighting
-Plug 'justinmk/vim-syntax-extra'          " More Syntax highlighting
 Plug 'justinmk/vim-sneak'                 " Motions
 Plug 'wellle/targets.vim'                 " More targets
 Plug 'eraserhd/parinfer-rust'             " Lisp Parinfer
@@ -24,12 +22,13 @@ Plug 'tpope/vim-fugitive'                 " Git
 Plug 'tpope/vim-repeat'                   " Repeat last command
 Plug 'tpope/vim-eunuch'                   " Unix commands
 Plug 'morhetz/gruvbox'                    " Gruvbox colorscheme
-Plug 'arcticicestudio/nord-vim'           " Nord theme
-Plug 'yonlu/omni.vim'                     " Omni theme
-Plug 'dracula/vim'                        " Dracula theme
+"Plug 'arcticicestudio/nord-vim'           " Nord theme
+"Plug 'yonlu/omni.vim'                     " Omni theme
+"Plug 'cocopon/iceberg.vim'                " Iceberg theme
+"Plug 'dracula/vim'                        " Dracula theme
 Plug 'andymass/vim-matchup'               " Match blocks
-Plug 'vimwiki/vimwiki'                    " Wiki on vim
-Plug 'vifm/vifm.vim'                      " File browser
+"Plug 'vimwiki/vimwiki'                    " Wiki on vim
+"Plug 'vifm/vifm.vim'                      " File browser
 Plug 'bakpakin/fennel.vim'                " Fennel syntax highlightning
 Plug 'unblevable/quick-scope'             " Show motions
 Plug 'neoclide/jsonc.vim'                 " Allow comments in JSON
@@ -39,8 +38,8 @@ Plug 'samoshkin/vim-mergetool'            " Merge tool
 Plug 'machakann/vim-highlightedyank'      " Highlight yank
 Plug 'chaoren/vim-wordmotion'             " Word motions work with camelcase
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } " Fuzzy finding filenames
-Plug 'Olical/aniseed'                       " Fennel neovim config
 Plug 'junegunn/fzf.vim'
+Plug 'Olical/aniseed'                       " Fennel neovim config
 Plug '/usr/local/opt/ripgrep'             " Better than ag
 Plug 'vim-pandoc/vim-pandoc'              " Markdown
 Plug 'vim-pandoc/vim-pandoc-syntax'       " Markdown syntax
@@ -48,44 +47,38 @@ Plug 'prabirshrestha/async.vim'           " Async plugins
 Plug 'APZelos/blamer.nvim'                " Git blame
 Plug 'vim-scripts/dbext.vim'              " Database access
 Plug 'Olical/conjure'                     " Clojure eval
+Plug 'pantharshit00/vim-prisma'           " Prisma syntax
+Plug 'alok/notational-fzf-vim'            " Notational velocity
+Plug '2072/PHP-Indenting-for-VIm'         " fix php identation issues
+Plug 'petertriho/nvim-scrollbar'          " Scrollbar with diagnostics
+Plug 'rescript-lang/vim-rescript'         " Rescript language
 if has('nvim')
   Plug 'neovim/nvim-lspconfig' " Language server protocol configurations. Only neovim
   Plug 'hrsh7th/nvim-compe'                 " Autocomplete
   Plug 'lewis6991/gitsigns.nvim'            " Better, faster gitgutter
   Plug 'nvim-treesitter/nvim-treesitter'    " Code highlight
   Plug 'nvim-treesitter/nvim-treesitter-textobjects' " Textobjects
-  Plug 'p00f/nvim-ts-rainbow'               " Rainbowparens
+  "Plug 'p00f/nvim-ts-rainbow'               " Rainbowparens
   Plug 'ojroques/nvim-lspfuzzy', {'branch': 'main'} " Lsp search displays in FZF
   Plug 'nvim-lua/plenary.nvim'               " Lua functions
   Plug 'nvim-lua/popup.nvim'                 " Popup windows
-  Plug 'romgrk/barbar.nvim'                  " Tabbar
+  "Plug 'romgrk/barbar.nvim'                  " Tabbar
   Plug 'RRethy/nvim-base16'                  " Base16 themes
   Plug 'hoob3rt/lualine.nvim'                " Lua statusline
   Plug 'kyazdani42/nvim-tree.lua'            " Tree viewer
   Plug 'kosayoda/nvim-lightbulb'             " Code action lightbulb emoji
-  Plug 'creativenull/diagnosticls-configs-nvim'      " Diagnostics with linters and formatters
+  Plug 'norcalli/nvim-colorizer.lua'         " Color preview
+  Plug 'jose-elias-alvarez/null-ls.nvim'     " Language Server for linters
+  Plug 'stevearc/dressing.nvim'              " Better UI
+  Plug 'SmiteshP/nvim-gps'                   " Show AST cursor
 
   " LSP config
-  nnoremap <leader> gd        <cmd>lua vim.lsp.buf.declaration()<CR>
-  nnoremap <silent> <space>l  <cmd>lua vim.lsp.codelens.display()<CR>
-  nnoremap <silent> <space>re <cmd>lua vim.lsp.buf.rename()<CR>
-  nnoremap <silent> gd        <cmd>lua vim.lsp.buf.definition()<CR>
-  nnoremap <silent> K         <cmd>lua vim.lsp.buf.hover()<CR>
-  nnoremap <silent> gD        <cmd>lua vim.lsp.buf.implementation()<CR>
-  nnoremap <silent> 1gD       <cmd>lua vim.lsp.buf.type_definition()<CR>
-  nnoremap <silent> gr        <cmd>lua vim.lsp.buf.references()<CR>
-  " nnoremap <silent> <leader>n <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
-  nnoremap <silent> <leader>rn <cmd>lua vim.lsp.buf.rename()<CR>
-  " nnoremap <silent> <leader>N <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
-  nnoremap <silent> <c-a>     <cmd>lua vim.lsp.buf.code_action()<CR>
-  nnoremap <silent> <space>= <cmd>lua vim.lsp.buf.formatting_seq_sync()<CR>
   nnoremap <silent> <C-c> <C-c> :ConjureEvalCurrentForm<CR>
 
   inoremap <silent><expr> <C-Space> compe#complete()
   inoremap <silent><expr> <C-k> pumvisible() ? "\<Up>" : "\<C-k>"
   inoremap <silent><expr> <C-j> pumvisible() ? "\<Down>" : "\<C-j>"
 
-  set updatetime=300
   set signcolumn=yes
 
   "autocmd CursorHold,CursorHoldI,InsertLeave <buffer> lua vim.lsp.codelens.refresh()
@@ -113,13 +106,6 @@ set completeopt=menuone,noselect
 set shortmess+=c
 
 set clipboard=unnamedplus
-
-" timeout
-set ttimeout
-set ttimeoutlen=0
-
-" Update time
-set updatetime=100
 
 " Folding
 set foldmethod=expr
@@ -163,12 +149,16 @@ nnoremap <leader>s :mksession<CR>
 inoremap jk <Esc>
 
 " UI
+set hidden
+set signcolumn=yes
+set cmdheight=2
+set showtabline=0
 set showcmd
 set wildmenu
 set wildmode=list:longest,full
-set showmatch
+set guicursor=n-v-c-sm:block,i-ci-ve:block,r-cr-o:hor20
 set ruler
-set laststatus=2
+set laststatus=3
 set noshowmode
 if has('nvim')
   set inccommand=nosplit
@@ -185,14 +175,14 @@ augroup numbertoggle
   autocmd BufLeave,FocusLost,InsertEnter,WinLeave * if &nu | set nornu | endif
 augroup END
 
-hi CursorLine cterm=underline term=underline
-
-set background=dark
-highlight Comment cterm=italic term=italic
+if strftime("%H") < 18
+  set background=light
+else
+  set background=dark
+endif
 if has("nvim")
   set termguicolors
 endif
-colorscheme dracula
 if has("gui_running")
   set guifont=PragmataPro\ Mono\ Liga:h16
   autocmd! GUIEnter * set vb t_vb=
@@ -201,23 +191,32 @@ let g:gruvbox_contrast_dark='hard'
 let g:gruvbox_contrast_light='soft'
 let g:gruvbox_italic=1
 let g:gruvbox_bold=1
+let g:gruvbox_style='night'
+
+colorscheme gruvbox
+
+hi Comment cterm=italic term=italic gui=italic guifg=DarkGray
 
 " barbar
-let bufferline = get(g:, 'bufferline', {})
-let bufferline.closable = v:false
-let bufferline.maximum_padding = 1
-let bufferline.icons = v:false
+" let bufferline = get(g:, 'bufferline', {})
+" let bufferline.closable = v:false
+" let bufferline.maximum_padding = 1
+" let bufferline.icons = v:false
 
 " Neovide config
 let g:neovide_cursor_animation_length=0
 
 " Cursorline
 set cursorline
+
 " Search
 set incsearch
 set hlsearch is
 set ignorecase
 set smartcase
+set showmatch
+set path=**
+
 " Turn off search highlight
 nnoremap <silent> // :noh<CR>
 
@@ -228,17 +227,19 @@ set wildignore+=*.zip,*.png,*.gif,*.pdf,*DS_Store*,*/.git/*,*/node_modules/*,yar
 let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
 
 augroup qa_colors
-  autocmd!
-  autocmd ColorScheme * highlight QuickScopePrimary guifg='#fb4934' gui=underline ctermfg=167 cterm=underline
-  autocmd ColorScheme * highlight QuickScopeSecondary guifg='#fabd2f' gui=underline ctermfg=214 cterm=underline
+  hi QuickScopePrimary guifg=#282828 guibg=#8ec07c gui=bold ctermfg=167 cterm=underline
+  hi QuickScopeSecondary guifg=#282828 guibg=#fabd2f gui=bold ctermfg=214 cterm=underline
 augroup END
 
 " Sneak
 let g:sneak#label = 1
 let g:sneak#s_next = 1
 let g:sneak#use_ic_scs = 1 "Case insensitive
-highlight Sneak guifg=black guibg=#00C7DF ctermfg=black ctermbg=cyan
-highlight SneakScope guifg=red guibg=yellow ctermfg=red ctermbg=yellow
+augroup sneak_colors
+  hi Sneak guifg=#282828 guibg=#fb4934 gui=bold ctermfg=black ctermbg=cyan
+  hi SneakScope guifg=#282828 guibg=#8ec07c gui=bold ctermfg=red ctermbg=yellow
+  hi SneakLabel guifg=#282828 guibg=#fabd2f gui=bold
+augroup END
 
 " Movement
 nnoremap j gj
@@ -255,32 +256,29 @@ nnoremap ^ <nop>
 vnoremap < <gv
 vnoremap > >gv
 
-" Backspace
-set backspace=indent,eol,start
-
 " Auto pairs shortcut
 let g:AutoPairsShortcutFastWrap='<C-e>'
 
 " NVim Tree
-let g:nvim_tree_gitignore=1
-let g:nvim_tree_auto_open=1
+"let g:nvim_tree_show_icons=1
 let g:nvim_tree_git_hl=1
-let g:nvim_tree_lsp_diagnostics=1
-let g:nvim_tree_hijack_netrw=0
-let g:nvim_tree_disable_netrw=0
 
-" TABS
+" Editor
 set tabstop=2
 set softtabstop=2
 set shiftwidth=2
 set expandtab
 set autoindent
 set smartindent
+set smarttab
+set scrolloff=5
+set lazyredraw
+set wildignorecase
+
 
 " Column
 set textwidth=80
 set colorcolumn=81
-hi ColorColumn ctermbg=DarkBlue
 
 " Path
 let &path.="src/include,/usr/include/AL,"
@@ -297,11 +295,20 @@ set autoread
 if has('mouse')
   set mouse=a
 endif
-set encoding=utf8
-set ffs=unix,dos,mac
 
-" When scrolling, keep cursor 3 lines away from screen border
-set scrolloff=3
+" System
+set encoding=utf8
+set nobackup
+set noswapfile
+set ffs=unix,dos,mac
+set updatetime=250
+set undofile
+"let &undodir=s:cnull.config.undodir
+set undolevels=10000
+set history=10000
+set backspace=indent,eol,start
+set ttimeout
+set ttimeoutlen=0
 
 " Ctags executable
 let g:tagbar_ctags_bin = '/usr/local/Cellar/ctags/5.8_1/bin/ctags'
@@ -329,7 +336,11 @@ set guioptions-=L "remove left scroll bar
 let g:rust_recommended_style=0
 
 " Spell Checking
-autocmd filetype tex,latex,md,txt,wiki setlocal spelllang=es spell complete+=kspell
+autocmd filetype tex,latex,md,txt,wiki,pandoc setlocal spelllang=es spell complete+=kspell
+
+" Markdown
+autocmd filetype md,pandoc nmap gd <Plug>(pandoc-keyboard-links-open)
+autocmd filetype md,pandoc setlocal sua+=.md
 
 " Use FZF for z=
 function! FzfSpellSink(word)
@@ -352,6 +363,9 @@ au BufNewFile, BufRead *.fs set ft=forth
 
 " Ocaml
 let g:opamshare=substitute(system('opam config var share'), '\n$', '', '''')
+
+" Notional FZF
+let g:nv_search_paths = ['~/notes']
 
 " Lua functions
 if has('nvim')
