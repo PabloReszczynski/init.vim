@@ -29,25 +29,40 @@ nls.setup({
     on_attach = on_attach,
     debug = true,
     sources = {
+      -- Lua
       nls.builtins.formatting.stylua,
+
+      -- Python
+      nls.builtins.formatting.isort,
       nls.builtins.formatting.black,
+      nls.builtins.diagnostics.flake8,
+      nls.builtins.diagnostics.mypy,
+
+      -- Javascript
       nls.builtins.diagnostics.eslint.with({
         prefer_local = "node_modules/.bin"
       }),
       nls.builtins.formatting.prettier.with({
         prefer_local = "node_modules/.bin",
       }),
+
+      -- Vim
       nls.builtins.diagnostics.vint,
+      nls.builtins.diagnostics.stylelint,
+      nls.builtins.formatting.stylelint,
     },
 })
 
 -- LSP Configuration
 
+local capabilities = require("cmp_nvim_lsp").update_capabilities(
+  vim.lsp.protocol.make_client_capabilities()
+);
 local nvim_lsp = require"lspconfig"
 local lsp_servers = {
   "tsserver",
   "rls",
-  "pylsp",
+  "pyright",
   "dartls",
   "hls",
   "jsonls",
@@ -58,6 +73,8 @@ local lsp_servers = {
   "clojure_lsp",
   "sourcekit",
   "rescriptls",
+  "sourcekit",
+  "ltex"
 }
 local nvim = vim
 
@@ -92,7 +109,8 @@ for _, server in ipairs(lsp_servers) do
       on_attach = function (client, bufr)
         client.server_capabilities["document_formatting"] = false
         on_attach(client, bufr)
-      end
+      end,
+      capabilities = capabilities,
     }
   elseif server == "rescriptls" then
     nvim_lsp[server].setup {
@@ -124,36 +142,22 @@ require'dressing'.setup {
   }
 }
 
-nvim.g.tmuxline_separators = {
-  left = "",
-  left_alt = "|",
-  right = "",
-  right_alt = "|",
-  space = " "
-}
+require'fzf_lsp'.setup()
 
-nvim.g.lsp_diagnostics_enabled = 1
+local cmp = require("cmp")
+cmp.setup {
+  sources = cmp.config.sources {
+    { name = "nvim_lsp" },
+    { name = "buffer" },
+  },
 
-require'compe'.setup {
-  enabled = true;
-  autocomplete = true;
-  debug = false;
-  min_length = 1;
-  preselect = 'enable';
-  throttle_time = 80;
-  source_timeout =400;
-
-  source = {
-    omni = true;
-    path = false;
-    buffer = true;
-    nvim_lsp = true;
-    nvim_lua = false;
-    vsnip = false;
-    tags = false;
-    treesitter = true;
-    pandoc = true;
-  }
+  mapping = cmp.mapping.preset.insert({
+    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.abort(),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+  }),
 }
 
 treesitter_config.setup({
@@ -205,10 +209,6 @@ treesitter_config.setup({
       },
       lsp_interop = {
       enable = true,
-      peek_definition_code = {
-        ["df"] = "@function.outer",
-        ["dF"] = "@class.outer",
-      },
     },
     swap = {
       enable = true,
@@ -280,7 +280,7 @@ require("lualine").setup {
     lualine_z = {}
   },
   extensions = {
-    "nvim-tree",
+    -- "nvim-tree",
     "fzf",
     "fugitive",
   }
@@ -316,3 +316,13 @@ require('nvim-lightbulb').setup({
 })
 
 vim.opt.winbar = "%#WinBarSeparator# %*%#WinBarContent#%f%*%#WinBarSeparator# %*"
+
+-- LSP Colors
+local lspColors = require("lsp-colors")
+
+lspColors.setup({
+  Error = "#fb4934",
+  Warning = "#fabd2f",
+  Information = "#83a598",
+  Hint = "#8ec07c"
+})

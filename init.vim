@@ -27,7 +27,7 @@ Plug 'morhetz/gruvbox'                    " Gruvbox colorscheme
 "Plug 'cocopon/iceberg.vim'                " Iceberg theme
 "Plug 'dracula/vim'                        " Dracula theme
 Plug 'andymass/vim-matchup'               " Match blocks
-"Plug 'vimwiki/vimwiki'                    " Wiki on vim
+Plug 'vimwiki/vimwiki'                    " Wiki on vim
 "Plug 'vifm/vifm.vim'                      " File browser
 Plug 'bakpakin/fennel.vim'                " Fennel syntax highlightning
 Plug 'unblevable/quick-scope'             " Show motions
@@ -39,7 +39,7 @@ Plug 'machakann/vim-highlightedyank'      " Highlight yank
 Plug 'chaoren/vim-wordmotion'             " Word motions work with camelcase
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } " Fuzzy finding filenames
 Plug 'junegunn/fzf.vim'
-Plug 'Olical/aniseed'                       " Fennel neovim config
+Plug 'Olical/aniseed'                     " Fennel neovim config
 Plug '/usr/local/opt/ripgrep'             " Better than ag
 Plug 'vim-pandoc/vim-pandoc'              " Markdown
 Plug 'vim-pandoc/vim-pandoc-syntax'       " Markdown syntax
@@ -52,14 +52,20 @@ Plug 'alok/notational-fzf-vim'            " Notational velocity
 Plug '2072/PHP-Indenting-for-VIm'         " fix php identation issues
 Plug 'petertriho/nvim-scrollbar'          " Scrollbar with diagnostics
 Plug 'rescript-lang/vim-rescript'         " Rescript language
+Plug 'towolf/vim-helm'                    " Helm templates
 if has('nvim')
   Plug 'neovim/nvim-lspconfig' " Language server protocol configurations. Only neovim
-  Plug 'hrsh7th/nvim-compe'                 " Autocomplete
+
+  Plug 'hrsh7th/cmp-nvim-lsp'               " Autocomplete
+  Plug 'hrsh7th/cmp-buffer'
+  Plug 'hrsh7th/nvim-cmp'
+
   Plug 'lewis6991/gitsigns.nvim'            " Better, faster gitgutter
   Plug 'nvim-treesitter/nvim-treesitter'    " Code highlight
   Plug 'nvim-treesitter/nvim-treesitter-textobjects' " Textobjects
   "Plug 'p00f/nvim-ts-rainbow'               " Rainbowparens
   Plug 'ojroques/nvim-lspfuzzy', {'branch': 'main'} " Lsp search displays in FZF
+  Plug 'gfanto/fzf-lsp.nvim'                 " FZF on definitions
   Plug 'nvim-lua/plenary.nvim'               " Lua functions
   Plug 'nvim-lua/popup.nvim'                 " Popup windows
   "Plug 'romgrk/barbar.nvim'                  " Tabbar
@@ -71,6 +77,7 @@ if has('nvim')
   Plug 'jose-elias-alvarez/null-ls.nvim'     " Language Server for linters
   Plug 'stevearc/dressing.nvim'              " Better UI
   Plug 'SmiteshP/nvim-gps'                   " Show AST cursor
+  Plug 'folke/lsp-colors.nvim'
 
   " LSP config
   nnoremap <silent> <C-c> <C-c> :ConjureEvalCurrentForm<CR>
@@ -102,7 +109,7 @@ let g:startify_custom_header =
 " Completion
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-set completeopt=menuone,noselect
+set completeopt=menu,menuone,noselect
 set shortmess+=c
 
 set clipboard=unnamedplus
@@ -132,8 +139,8 @@ nnoremap <silent> <leader>q :bd<CR>
 vnoremap <silent> . :norm . <CR>
 nnoremap <C-s> :%s//g<Left><Left>
 nnoremap <leader>gs :G <CR>
-nnoremap <C-j> 3<C-e>
-nnoremap <C-k> 3<C-y>
+" nnoremap <C-j> 3<C-e>
+" nnoremap <C-k> 3<C-y>
 nnoremap <f1> <nop>
 inoremap <f1> <nop>
 nnoremap <leader>t :enew<CR>
@@ -177,8 +184,22 @@ augroup END
 
 if strftime("%H") < 18
   set background=light
+  colorscheme base16-gruvbox-light-soft
+  let $BAT_THEME="gruvbox-light"
+  let $FZF_DEFAULT_OPTS="
+        \ --color=fg:#3c3836,bg:#f2e5bc,hl:#458588
+        \ --color=fg+:#282828,bg+:#fbf1c7,hl+:#076678
+        \ --color=info:#d79921,prompt:#cc241d,pointer:#b16286
+        \ --color=marker:#98971a,spinner:#b16286,header:#7c6f64"
 else
   set background=dark
+  colorscheme base16-gruvbox-dark-hard
+  let $BAT_THEME="gruvbox-dark"
+  let $FZF_DEFAULT_OPTS="
+        \ --color=fg:#ebdbb2,bg:#282828,hl:#458588
+        \ --color=fg+:#f2e5bc,bg+:#32302f,hl+:#076678
+        \ --color=info:#d79921,prompt:#cc241d,pointer:#b16286
+        \ --color=marker:#98971a,spinner:#b16286,header:#7c6f64"
 endif
 if has("nvim")
   set termguicolors
@@ -192,8 +213,6 @@ let g:gruvbox_contrast_light='soft'
 let g:gruvbox_italic=1
 let g:gruvbox_bold=1
 let g:gruvbox_style='night'
-
-colorscheme gruvbox
 
 hi Comment cterm=italic term=italic gui=italic guifg=DarkGray
 
@@ -366,6 +385,9 @@ let g:opamshare=substitute(system('opam config var share'), '\n$', '', '''')
 
 " Notional FZF
 let g:nv_search_paths = ['~/notes']
+
+" Vimwiki
+let g:vimwiki_list = [{'path': '~/.vimwiki/', 'syntax': 'markdown', 'ext': '.md'}]
 
 " Lua functions
 if has('nvim')
