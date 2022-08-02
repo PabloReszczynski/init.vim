@@ -9,9 +9,10 @@ Plug 'mhinz/vim-startify'                 " Start screen
 Plug 'airblade/vim-rooter'                " Make project directory as root
 " Plug 'keith/tmux.vim'                     " TMUX
 " Plug 'edkolev/tmuxline.vim'               " TMUX line
-Plug 'justinmk/vim-sneak'                 " Motions
+" Plug 'justinmk/vim-sneak'                 " Motions
 Plug 'wellle/targets.vim'                 " More targets
-Plug 'eraserhd/parinfer-rust'             " Lisp Parinfer
+" Lisp parinfer
+Plug 'eraserhd/parinfer-rust', {'for': ['clojure', 'scheme', 'racket', 'common lisp']}
 Plug 'guns/vim-sexp'                      " Lisp motions
 Plug 'tpope/vim-sexp-mappings-for-regular-people' " Lisp-sexp mappings
 Plug 'tpope/vim-surround'                 " Surround parens
@@ -21,7 +22,8 @@ Plug 'tpope/vim-commentary'               " comment with 'gc'
 Plug 'tpope/vim-fugitive'                 " Git
 Plug 'tpope/vim-repeat'                   " Repeat last command
 Plug 'tpope/vim-eunuch'                   " Unix commands
-Plug 'morhetz/gruvbox'                    " Gruvbox colorscheme
+"Plug 'morhetz/gruvbox'                    " Gruvbox colorscheme
+Plug 'ellisonleao/gruvbox.nvim'           " Gruvbox colorscheme
 "Plug 'arcticicestudio/nord-vim'           " Nord theme
 "Plug 'yonlu/omni.vim'                     " Omni theme
 "Plug 'cocopon/iceberg.vim'                " Iceberg theme
@@ -32,13 +34,14 @@ Plug 'vimwiki/vimwiki'                    " Wiki on vim
 Plug 'bakpakin/fennel.vim'                " Fennel syntax highlightning
 Plug 'unblevable/quick-scope'             " Show motions
 Plug 'neoclide/jsonc.vim'                 " Allow comments in JSON
-Plug 'BeneCollyridam/futhark-vim'         " Futhark
+"Plug 'BeneCollyridam/futhark-vim'         " Futhark
 Plug 'dbakker/vim-projectroot'            " Find the root of the project
 Plug 'samoshkin/vim-mergetool'            " Merge tool
 Plug 'machakann/vim-highlightedyank'      " Highlight yank
 Plug 'chaoren/vim-wordmotion'             " Word motions work with camelcase
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } " Fuzzy finding filenames
-Plug 'junegunn/fzf.vim'
+" FZF
+Plug 'junegunn/fzf.vim', { 'on': ['Files', 'Buffers', 'Rg'] }
 Plug 'Olical/aniseed'                     " Fennel neovim config
 Plug '/usr/local/opt/ripgrep'             " Better than ag
 Plug 'vim-pandoc/vim-pandoc'              " Markdown
@@ -46,7 +49,7 @@ Plug 'vim-pandoc/vim-pandoc-syntax'       " Markdown syntax
 Plug 'prabirshrestha/async.vim'           " Async plugins
 Plug 'APZelos/blamer.nvim'                " Git blame
 Plug 'vim-scripts/dbext.vim'              " Database access
-Plug 'Olical/conjure'                     " Clojure eval
+Plug 'Olical/conjure', { 'for': 'clojure'} " Clojure eval
 Plug 'pantharshit00/vim-prisma'           " Prisma syntax
 Plug 'alok/notational-fzf-vim'            " Notational velocity
 Plug '2072/PHP-Indenting-for-VIm'         " fix php identation issues
@@ -69,13 +72,15 @@ if has('nvim')
   Plug 'nvim-lua/plenary.nvim'               " Lua functions
   Plug 'nvim-lua/popup.nvim'                 " Popup windows
   "Plug 'romgrk/barbar.nvim'                  " Tabbar
-  Plug 'RRethy/nvim-base16'                  " Base16 themes
+  "Plug 'RRethy/nvim-base16'                  " Base16 themes
   Plug 'hoob3rt/lualine.nvim'                " Lua statusline
-  Plug 'kyazdani42/nvim-tree.lua'            " Tree viewer
-  Plug 'kosayoda/nvim-lightbulb'             " Code action lightbulb emoji
+  " Tree viewer
+  Plug 'kyazdani42/nvim-tree.lua', { 'on': 'NvimTreeToggle' }
+  "Plug 'kosayoda/nvim-lightbulb'             " Code action lightbulb emoji
   Plug 'norcalli/nvim-colorizer.lua'         " Color preview
   Plug 'jose-elias-alvarez/null-ls.nvim'     " Language Server for linters
   Plug 'stevearc/dressing.nvim'              " Better UI
+  Plug 'ggandor/leap.nvim'                   " Motions
   Plug 'SmiteshP/nvim-gps'                   " Show AST cursor
   Plug 'folke/lsp-colors.nvim'
 
@@ -118,12 +123,6 @@ set clipboard=unnamedplus
 set foldmethod=expr
 set foldexpr=nvim_treesitter#foldexpr()
 set foldlevel=99
-
-let g:nvim_tree_show_icons = {
-      \ 'git': 1,
-      \ 'folders': 0,
-      \ 'files': 0,
-      \ }
 
 " mappings
 map <F2> :Fern . -drawer -reveal=% -toggle <CR>
@@ -184,23 +183,27 @@ augroup END
 
 if strftime("%H") < 18
   set background=light
-  colorscheme base16-gruvbox-light-soft
   let $BAT_THEME="gruvbox-light"
   let $FZF_DEFAULT_OPTS="
         \ --color=fg:#3c3836,bg:#f2e5bc,hl:#458588
         \ --color=fg+:#282828,bg+:#fbf1c7,hl+:#076678
         \ --color=info:#d79921,prompt:#cc241d,pointer:#b16286
         \ --color=marker:#98971a,spinner:#b16286,header:#7c6f64"
+  lua require("gruvbox").setup({ contrast = "soft" })
+
 else
   set background=dark
-  colorscheme base16-gruvbox-dark-hard
   let $BAT_THEME="gruvbox-dark"
   let $FZF_DEFAULT_OPTS="
         \ --color=fg:#ebdbb2,bg:#282828,hl:#458588
         \ --color=fg+:#f2e5bc,bg+:#32302f,hl+:#076678
         \ --color=info:#d79921,prompt:#cc241d,pointer:#b16286
         \ --color=marker:#98971a,spinner:#b16286,header:#7c6f64"
+  lua require("gruvbox").setup({ contrast = "hard" })
 endif
+
+colorscheme gruvbox
+
 if has("nvim")
   set termguicolors
 endif
@@ -251,14 +254,14 @@ augroup qa_colors
 augroup END
 
 " Sneak
-let g:sneak#label = 1
-let g:sneak#s_next = 1
-let g:sneak#use_ic_scs = 1 "Case insensitive
-augroup sneak_colors
-  hi Sneak guifg=#282828 guibg=#fb4934 gui=bold ctermfg=black ctermbg=cyan
-  hi SneakScope guifg=#282828 guibg=#8ec07c gui=bold ctermfg=red ctermbg=yellow
-  hi SneakLabel guifg=#282828 guibg=#fabd2f gui=bold
-augroup END
+" let g:sneak#label = 1
+" let g:sneak#s_next = 1
+" let g:sneak#use_ic_scs = 1 "Case insensitive
+" augroup sneak_colors
+"   hi Sneak guifg=#282828 guibg=#fb4934 gui=bold ctermfg=black ctermbg=cyan
+"   hi SneakScope guifg=#282828 guibg=#8ec07c gui=bold ctermfg=red ctermbg=yellow
+"   hi SneakLabel guifg=#282828 guibg=#fabd2f gui=bold
+" augroup END
 
 " Movement
 nnoremap j gj
@@ -296,7 +299,7 @@ set wildignorecase
 
 
 " Column
-set textwidth=80
+"set textwidth=80
 set colorcolumn=81
 
 " Path

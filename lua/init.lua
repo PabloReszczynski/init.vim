@@ -47,9 +47,12 @@ nls.setup({
       }),
 
       -- Vim
-      nls.builtins.diagnostics.vint,
       nls.builtins.diagnostics.stylelint,
       nls.builtins.formatting.stylelint,
+
+      -- Shell
+      nls.builtins.diagnostics.shellcheck,
+      nls.builtins.formatting.shellharden,
     },
 })
 
@@ -63,6 +66,7 @@ local lsp_servers = {
   "tsserver",
   "rls",
   "pyright",
+  "jedi_language_server",
   "dartls",
   "hls",
   "jsonls",
@@ -161,7 +165,6 @@ cmp.setup {
 }
 
 treesitter_config.setup({
-    ensure_installed = "all",
     ignore_install = { "haskell", "lua", "latex" },
     highlight = { enable = true },
     rainbow = {
@@ -289,31 +292,45 @@ require("lualine").setup {
 -- Nvim tree
 require"nvim-tree".setup {
   diagnostics = {
-    enable = true
+    enable = true,
+    show_on_dirs = true,
+    icons = {
+      hint = "",
+      info = "",
+      warning = "⚠",
+      error = "⚠",
+    }
   },
   git = {
     ignore = false
+  },
+  renderer = {
+    icons = {
+      show = {
+        file = false,
+        folder = false,
+        git = true,
+      },
+      glyphs = {
+        git = {
+          unmerged = "",
+          deleted = ""
+        }
+      }
+    }
+  },
+  filters = {
+    dotfiles = true
   }
 }
 
-nvim.api.nvim_command('autocmd CursorHoldI * silent! lua vim.lsp.buf.signature_help()')
+-- nvim.api.nvim_command('autocmd CursorHoldI * silent! lua vim.lsp.buf.signature_help()')
 
 -- Colorizer
 require"colorizer".setup()
 
 -- Scrollbar
 require("scrollbar").setup()
-
--- Lightbulb
-
-require('nvim-lightbulb').setup({
-  autocmd = {enabled = true},
-  ignore = { "null-ls" },
-  sign = {
-    enabled = true,
-    text = "🂱",
-  }
-})
 
 vim.opt.winbar = "%#WinBarSeparator# %*%#WinBarContent#%f%*%#WinBarSeparator# %*"
 
@@ -326,3 +343,6 @@ lspColors.setup({
   Information = "#83a598",
   Hint = "#8ec07c"
 })
+
+-- Leap
+require('leap').set_default_keymaps()
