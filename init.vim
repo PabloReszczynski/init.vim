@@ -22,8 +22,6 @@ Plug 'tpope/vim-commentary'               " comment with 'gc'
 Plug 'tpope/vim-fugitive'                 " Git
 Plug 'tpope/vim-repeat'                   " Repeat last command
 Plug 'tpope/vim-eunuch'                   " Unix commands
-"Plug 'morhetz/gruvbox'                    " Gruvbox colorscheme
-Plug 'ellisonleao/gruvbox.nvim'           " Gruvbox colorscheme
 "Plug 'arcticicestudio/nord-vim'           " Nord theme
 "Plug 'yonlu/omni.vim'                     " Omni theme
 "Plug 'cocopon/iceberg.vim'                " Iceberg theme
@@ -42,27 +40,30 @@ Plug 'chaoren/vim-wordmotion'             " Word motions work with camelcase
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } " Fuzzy finding filenames
 " FZF
 Plug 'junegunn/fzf.vim', { 'on': ['Files', 'Buffers', 'Rg'] }
-Plug 'Olical/aniseed'                     " Fennel neovim config
 Plug '/usr/local/opt/ripgrep'             " Better than ag
 Plug 'vim-pandoc/vim-pandoc'              " Markdown
 Plug 'vim-pandoc/vim-pandoc-syntax'       " Markdown syntax
 Plug 'prabirshrestha/async.vim'           " Async plugins
-Plug 'APZelos/blamer.nvim'                " Git blame
 Plug 'vim-scripts/dbext.vim'              " Database access
 Plug 'Olical/conjure', { 'for': 'clojure'} " Clojure eval
 Plug 'pantharshit00/vim-prisma'           " Prisma syntax
 Plug 'alok/notational-fzf-vim'            " Notational velocity
 Plug '2072/PHP-Indenting-for-VIm'         " fix php identation issues
-Plug 'petertriho/nvim-scrollbar'          " Scrollbar with diagnostics
 Plug 'rescript-lang/vim-rescript'         " Rescript language
 Plug 'towolf/vim-helm'                    " Helm templates
+Plug 'chrisbra/unicode.vim'               " Unicode search
 if has('nvim')
   Plug 'neovim/nvim-lspconfig' " Language server protocol configurations. Only neovim
 
   Plug 'hrsh7th/cmp-nvim-lsp'               " Autocomplete
   Plug 'hrsh7th/cmp-buffer'
+  Plug 'hrsh7th/cmp-path'
   Plug 'hrsh7th/nvim-cmp'
 
+  Plug 'liuchengxu/vista.vim'               " View tags
+  Plug 'Olical/aniseed'                     " Fennel neovim config
+  Plug 'petertriho/nvim-scrollbar'          " Scrollbar with diagnostics
+  Plug 'APZelos/blamer.nvim'                " Git blame
   Plug 'lewis6991/gitsigns.nvim'            " Better, faster gitgutter
   Plug 'nvim-treesitter/nvim-treesitter'    " Code highlight
   Plug 'nvim-treesitter/nvim-treesitter-textobjects' " Textobjects
@@ -82,6 +83,7 @@ if has('nvim')
   Plug 'stevearc/dressing.nvim'              " Better UI
   Plug 'ggandor/leap.nvim'                   " Motions
   Plug 'SmiteshP/nvim-gps'                   " Show AST cursor
+  Plug 'ggandor/leap-ast.nvim'               " Hop around AST
   Plug 'folke/lsp-colors.nvim'
 
   " LSP config
@@ -95,9 +97,20 @@ if has('nvim')
 
   "autocmd CursorHold,CursorHoldI,InsertLeave <buffer> lua vim.lsp.codelens.refresh()
 
+  Plug 'ellisonleao/gruvbox.nvim'           " Gruvbox colorscheme
+else
+  Plug 'morhetz/gruvbox'                    " Gruvbox colorscheme
 endif
+
 call plug#end()
 filetype plugin indent on
+
+" Neovide configuration
+if exists("g:neovide")
+  let g:neovide_refresh_rate=60
+  let g:neovide_scroll_animation_length=0.1
+  set guifont=PragmataPro\ Mono\ Liga:h16
+endif
 
 " NVIM
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
@@ -127,9 +140,9 @@ set foldlevel=99
 " mappings
 map <F2> :Fern . -drawer -reveal=% -toggle <CR>
 nnoremap <leader><tab> :b#<CR>
-nnoremap <leader>tt :tabnew<CR>
-nnoremap <leader>tn :tabnext<CR>
-nnoremap <leader>tp :tabprevious<CR>
+" nnoremap <leader>tt :tabnew<CR>
+" nnoremap <leader>tn :tabnext<CR>
+" nnoremap <leader>tp :tabprevious<CR>
 nnoremap <silent> <leader>ff :Files<CR>
 nnoremap <silent> <leader>bb :Buffers<CR>
 nnoremap <silent> <leader>aa :Rg<CR>
@@ -181,7 +194,8 @@ augroup numbertoggle
   autocmd BufLeave,FocusLost,InsertEnter,WinLeave * if &nu | set nornu | endif
 augroup END
 
-if strftime("%H") < 18
+"if strftime("%H") < 18
+if 0
   set background=light
   let $BAT_THEME="gruvbox-light"
   let $FZF_DEFAULT_OPTS="
@@ -218,12 +232,6 @@ let g:gruvbox_bold=1
 let g:gruvbox_style='night'
 
 hi Comment cterm=italic term=italic gui=italic guifg=DarkGray
-
-" barbar
-" let bufferline = get(g:, 'bufferline', {})
-" let bufferline.closable = v:false
-" let bufferline.maximum_padding = 1
-" let bufferline.icons = v:false
 
 " Neovide config
 let g:neovide_cursor_animation_length=0
@@ -281,10 +289,6 @@ vnoremap > >gv
 " Auto pairs shortcut
 let g:AutoPairsShortcutFastWrap='<C-e>'
 
-" NVim Tree
-"let g:nvim_tree_show_icons=1
-let g:nvim_tree_git_hl=1
-
 " Editor
 set tabstop=2
 set softtabstop=2
@@ -296,10 +300,11 @@ set smarttab
 set scrolloff=5
 set lazyredraw
 set wildignorecase
+set wrap
 
 
 " Column
-"set textwidth=80
+set textwidth=80
 set colorcolumn=81
 
 " Path

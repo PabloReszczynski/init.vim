@@ -22,6 +22,8 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
 end
 
+-- vim.keymap.set({'n', 'x', 'o'}, 'x', function() require'leap-ast'.leap() end, {})
+
 -- NULL-LS diagnostics
 local nls = require("null-ls")
 
@@ -153,6 +155,7 @@ cmp.setup {
   sources = cmp.config.sources {
     { name = "nvim_lsp" },
     { name = "buffer" },
+    { name = "path" },
   },
 
   mapping = cmp.mapping.preset.insert({
@@ -249,11 +252,6 @@ local theme = function (time)
   end
 end
 
-
--- GPS
-local gps = require("nvim-gps")
-gps.setup()
-
 -- Lunaline
 require("lualine").setup {
   options = {
@@ -265,11 +263,6 @@ require("lualine").setup {
   sections = {
     lualine_a = {'mode'},
     lualine_b = {'branch', 'diagnostics'},
-    lualine_c = {
-      {
-        gps.get_location, cond = gps.is_available
-      }
-    },
     lualine_x = {'encoding', 'fileformat', 'filetype'},
     lualine_y = {'progress'},
     lualine_z = {'location'}
@@ -283,9 +276,9 @@ require("lualine").setup {
     lualine_z = {}
   },
   extensions = {
-    -- "nvim-tree",
+    "nvim-tree",
     "fzf",
-    "fugitive",
+    "fugitive"
   }
 }
 
@@ -295,8 +288,8 @@ require"nvim-tree".setup {
     enable = true,
     show_on_dirs = true,
     icons = {
-      hint = "",
-      info = "",
+      hint = "⧱",
+      info = "⧯",
       warning = "⚠",
       error = "⚠",
     }
@@ -307,17 +300,36 @@ require"nvim-tree".setup {
   renderer = {
     icons = {
       show = {
-        file = false,
+        file = true,
         folder = false,
+        folder_arrow = true,
         git = true,
       },
       glyphs = {
+        default = " ",
         git = {
+          unstaged = "☐",
+          staged = "☑",
           unmerged = "",
-          deleted = ""
-        }
-      }
-    }
+          deleted = "☒"
+        },
+        folder = {
+          arrow_closed = "•",
+          arrow_open = "‣",
+        },
+      },
+      webdev_colors = false,
+    },
+    highlight_git = true,
+    indent_markers = {
+      enable = true,
+      icons = {
+        corner = "└",
+        edge = "│",
+        item = "│",
+        none = " ",
+      },
+    },
   },
   filters = {
     dotfiles = true
@@ -346,3 +358,10 @@ lspColors.setup({
 
 -- Leap
 require('leap').set_default_keymaps()
+
+-- Vista
+vim.g.vista_default_executive = 'nvim_lsp'
+vim.g['vista#renderer#enable_icon'] = 1
+vim.g.vista_sidebar_width = 20
+vim.keymap.set('n', '<leader>vv', ':Vista!!<CR>', {silent=true, remap=true})
+vim.keymap.set('n', '<leader>tt', ':Vista finder<CR>', {silent=true, remap=true})
