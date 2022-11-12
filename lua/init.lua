@@ -26,6 +26,7 @@ end
 
 -- NULL-LS diagnostics
 local nls = require("null-ls")
+local nls_helpers = require("null-ls.helpers")
 
 nls.setup({
     on_attach = on_attach,
@@ -55,20 +56,23 @@ nls.setup({
       -- Shell
       nls.builtins.diagnostics.shellcheck,
       nls.builtins.formatting.shellharden,
+
+      -- Clojure
+      nls.builtins.formatting.cljstyle.with({
+
+      })
     },
 })
 
 -- LSP Configuration
 
-local capabilities = require("cmp_nvim_lsp").update_capabilities(
-  vim.lsp.protocol.make_client_capabilities()
-);
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
 local nvim_lsp = require"lspconfig"
 local lsp_servers = {
   "tsserver",
-  "rls",
+  "rust_analyzer",
   "pyright",
-  "jedi_language_server",
+  --"jedi_language_server",
   "dartls",
   "hls",
   "jsonls",
@@ -127,6 +131,21 @@ for _, server in ipairs(lsp_servers) do
         "--stdio"
       }
     }
+  elseif server == "rust_analyzer" then
+    nvim_lsp[server].setup {
+      on_attach = on_attach,
+      settings = {
+        ['rust-analyzer'] = {
+          checkOnSave = {
+            allFeatures = true,
+            overrideCommand = {
+              'cargo', 'clippy', '--workspace', '--message-format=json',
+              '--all-targets', '--all-features',
+            }
+          }
+        }
+      }
+    }
   else
     nvim_lsp[server].setup {
       on_attach = on_attach
@@ -169,7 +188,10 @@ cmp.setup {
 
 treesitter_config.setup({
     ignore_install = { "haskell", "lua", "latex" },
-    highlight = { enable = true },
+    highlight = {
+      enable = true,
+      disable = { "haskell", "lua", "latex" },
+    },
     rainbow = {
       enable = true,
       extended_mode = true,

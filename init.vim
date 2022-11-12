@@ -1,109 +1,20 @@
 set nocompatible
 filetype off
-" Plugins
-call plug#begin('~/.config/nvim/plugged')
-Plug 'junegunn/vim-plug'
-Plug 'scrooloose/nerdcommenter'           " NERD Commenter <leader>cc
-Plug 'jiangmiao/auto-pairs'               " Auto pair
-Plug 'mhinz/vim-startify'                 " Start screen
-Plug 'airblade/vim-rooter'                " Make project directory as root
-" Plug 'keith/tmux.vim'                     " TMUX
-" Plug 'edkolev/tmuxline.vim'               " TMUX line
-" Plug 'justinmk/vim-sneak'                 " Motions
-Plug 'wellle/targets.vim'                 " More targets
-" Lisp parinfer
-Plug 'eraserhd/parinfer-rust', {'for': ['clojure', 'scheme', 'racket', 'common lisp']}
-Plug 'guns/vim-sexp'                      " Lisp motions
-Plug 'tpope/vim-sexp-mappings-for-regular-people' " Lisp-sexp mappings
-Plug 'tpope/vim-surround'                 " Surround parens
-Plug 'tpope/vim-endwise'                  " highlight matching blocks
-Plug 'tpope/vim-unimpaired'               " Bracket mappings
-Plug 'tpope/vim-commentary'               " comment with 'gc'
-Plug 'tpope/vim-fugitive'                 " Git
-Plug 'tpope/vim-repeat'                   " Repeat last command
-Plug 'tpope/vim-eunuch'                   " Unix commands
-"Plug 'arcticicestudio/nord-vim'           " Nord theme
-"Plug 'yonlu/omni.vim'                     " Omni theme
-"Plug 'cocopon/iceberg.vim'                " Iceberg theme
-"Plug 'dracula/vim'                        " Dracula theme
-Plug 'andymass/vim-matchup'               " Match blocks
-Plug 'vimwiki/vimwiki'                    " Wiki on vim
-"Plug 'vifm/vifm.vim'                      " File browser
-Plug 'bakpakin/fennel.vim'                " Fennel syntax highlightning
-Plug 'unblevable/quick-scope'             " Show motions
-Plug 'neoclide/jsonc.vim'                 " Allow comments in JSON
-"Plug 'BeneCollyridam/futhark-vim'         " Futhark
-Plug 'dbakker/vim-projectroot'            " Find the root of the project
-Plug 'samoshkin/vim-mergetool'            " Merge tool
-Plug 'machakann/vim-highlightedyank'      " Highlight yank
-Plug 'chaoren/vim-wordmotion'             " Word motions work with camelcase
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } " Fuzzy finding filenames
-" FZF
-Plug 'junegunn/fzf.vim', { 'on': ['Files', 'Buffers', 'Rg'] }
-Plug '/usr/local/opt/ripgrep'             " Better than ag
-Plug 'vim-pandoc/vim-pandoc'              " Markdown
-Plug 'vim-pandoc/vim-pandoc-syntax'       " Markdown syntax
-Plug 'prabirshrestha/async.vim'           " Async plugins
-Plug 'vim-scripts/dbext.vim'              " Database access
-Plug 'Olical/conjure', { 'for': 'clojure'} " Clojure eval
-Plug 'pantharshit00/vim-prisma'           " Prisma syntax
-Plug 'alok/notational-fzf-vim'            " Notational velocity
-Plug '2072/PHP-Indenting-for-VIm'         " fix php identation issues
-Plug 'rescript-lang/vim-rescript'         " Rescript language
-Plug 'towolf/vim-helm'                    " Helm templates
-Plug 'chrisbra/unicode.vim'               " Unicode search
-if has('nvim')
-  Plug 'neovim/nvim-lspconfig' " Language server protocol configurations. Only neovim
-
-  Plug 'hrsh7th/cmp-nvim-lsp'               " Autocomplete
-  Plug 'hrsh7th/cmp-buffer'
-  Plug 'hrsh7th/cmp-path'
-  Plug 'hrsh7th/nvim-cmp'
-
-  Plug 'liuchengxu/vista.vim'               " View tags
-  Plug 'Olical/aniseed'                     " Fennel neovim config
-  Plug 'petertriho/nvim-scrollbar'          " Scrollbar with diagnostics
-  Plug 'APZelos/blamer.nvim'                " Git blame
-  Plug 'lewis6991/gitsigns.nvim'            " Better, faster gitgutter
-  Plug 'nvim-treesitter/nvim-treesitter'    " Code highlight
-  Plug 'nvim-treesitter/nvim-treesitter-textobjects' " Textobjects
-  "Plug 'p00f/nvim-ts-rainbow'               " Rainbowparens
-  Plug 'ojroques/nvim-lspfuzzy', {'branch': 'main'} " Lsp search displays in FZF
-  Plug 'gfanto/fzf-lsp.nvim'                 " FZF on definitions
-  Plug 'nvim-lua/plenary.nvim'               " Lua functions
-  Plug 'nvim-lua/popup.nvim'                 " Popup windows
-  "Plug 'romgrk/barbar.nvim'                  " Tabbar
-  "Plug 'RRethy/nvim-base16'                  " Base16 themes
-  Plug 'hoob3rt/lualine.nvim'                " Lua statusline
-  " Tree viewer
-  Plug 'kyazdani42/nvim-tree.lua', { 'on': 'NvimTreeToggle' }
-  "Plug 'kosayoda/nvim-lightbulb'             " Code action lightbulb emoji
-  Plug 'norcalli/nvim-colorizer.lua'         " Color preview
-  Plug 'jose-elias-alvarez/null-ls.nvim'     " Language Server for linters
-  Plug 'stevearc/dressing.nvim'              " Better UI
-  Plug 'ggandor/leap.nvim'                   " Motions
-  Plug 'SmiteshP/nvim-gps'                   " Show AST cursor
-  Plug 'ggandor/leap-ast.nvim'               " Hop around AST
-  Plug 'folke/lsp-colors.nvim'
-
-  " LSP config
-  nnoremap <silent> <C-c> <C-c> :ConjureEvalCurrentForm<CR>
-
-  inoremap <silent><expr> <C-Space> compe#complete()
-  inoremap <silent><expr> <C-k> pumvisible() ? "\<Up>" : "\<C-k>"
-  inoremap <silent><expr> <C-j> pumvisible() ? "\<Down>" : "\<C-j>"
-
-  set signcolumn=yes
-
-  "autocmd CursorHold,CursorHoldI,InsertLeave <buffer> lua vim.lsp.codelens.refresh()
-
-  Plug 'ellisonleao/gruvbox.nvim'           " Gruvbox colorscheme
-else
-  Plug 'morhetz/gruvbox'                    " Gruvbox colorscheme
-endif
-
-call plug#end()
 filetype plugin indent on
+
+if has('nvim')
+  "Load plugins
+  lua require("plugins")
+
+ " LSP config
+ nnoremap <silent> <C-c> <C-c> :ConjureEvalCurrentForm<CR>
+
+ inoremap <silent><expr> <C-Space> compe#complete()
+ inoremap <silent><expr> <C-k> pumvisible() ? "\<Up>" : "\<C-k>"
+ inoremap <silent><expr> <C-j> pumvisible() ? "\<Down>" : "\<C-j>"
+
+ set signcolumn=yes
+endif
 
 " Neovide configuration
 if exists("g:neovide")
@@ -179,6 +90,7 @@ set guicursor=n-v-c-sm:block,i-ci-ve:block,r-cr-o:hor20
 set ruler
 set laststatus=3
 set noshowmode
+set diffopt+=linematch:60,algorithm:patience,vertical
 if has('nvim')
   set inccommand=nosplit
 endif
@@ -304,8 +216,8 @@ set wrap
 
 
 " Column
-set textwidth=80
-set colorcolumn=81
+set textwidth=200
+set colorcolumn=111
 
 " Path
 let &path.="src/include,/usr/include/AL,"
@@ -400,4 +312,9 @@ let g:vimwiki_list = [{'path': '~/.vimwiki/', 'syntax': 'markdown', 'ext': '.md'
 " Lua functions
 if has('nvim')
    lua require('init')
+
+   augroup packer_user_config
+     autocmd!
+     autocmd BufWritePost plugins.lua source <afile> | PackerCompile
+   augroup end
 endif
