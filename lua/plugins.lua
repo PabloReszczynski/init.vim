@@ -65,7 +65,10 @@ return require('packer').startup(function(use)
   use 'petertriho/nvim-scrollbar'          -- Scrollbar with diagnostics
   use 'APZelos/blamer.nvim'                -- Git blame
   use 'lewis6991/gitsigns.nvim'            -- Better, faster gitgutter
-  use 'nvim-treesitter/nvim-treesitter'    -- Code highlight
+  use {                                    -- Code highlight
+    'nvim-treesitter/nvim-treesitter',
+    run = ':TSUpdate',
+  }
   use 'nvim-treesitter/nvim-treesitter-textobjects' -- Textobjects
   use 'p00f/nvim-ts-rainbow'               -- Rainbowparens
   use {                                    -- Lsp search displays in FZF
@@ -81,7 +84,11 @@ return require('packer').startup(function(use)
   -- Tree viewer
   use {
     'kyazdani42/nvim-tree.lua',
-    cmd = {'NvimTreeToggle' },
+    --cmd = {'NvimTreeToggle' },
+    requires = {
+      'nvim-tree/nvim-web-devicons', -- optional, for file icons
+    },
+    tag = 'nightly', -- optional, updated every week. (see issue #1193)
   }
   use 'kosayoda/nvim-lightbulb'             -- Code action lightbulb emoji
   use 'norcalli/nvim-colorizer.lua'         -- Color preview

@@ -305,58 +305,58 @@ require("lualine").setup {
 }
 
 -- Nvim tree
-require"nvim-tree".setup {
-  diagnostics = {
-    enable = true,
-    show_on_dirs = true,
-    icons = {
-      hint = "⧱",
-      info = "⧯",
-      warning = "⚠",
-      error = "⚠",
+    require("nvim-tree").setup {
+      diagnostics = {
+        enable = true,
+        show_on_dirs = true,
+        icons = {
+          hint = "⧱",
+          info = "⧯",
+          warning = "⚠",
+          error = "⚠",
+        }
+      },
+      git = {
+        ignore = false
+      },
+      renderer = {
+        icons = {
+          show = {
+            file = true,
+            folder = false,
+            folder_arrow = true,
+            git = true,
+          },
+          glyphs = {
+            default = " ",
+            git = {
+              unstaged = "☐",
+              staged = "☑",
+              unmerged = "",
+              deleted = "☒"
+            },
+            folder = {
+              arrow_closed = "•",
+              arrow_open = "‣",
+            },
+          },
+          webdev_colors = true,
+        },
+        highlight_git = true,
+        indent_markers = {
+          enable = true,
+          icons = {
+            corner = "└",
+            edge = "│",
+            item = "│",
+            none = " ",
+          },
+        },
+      },
+      filters = {
+        dotfiles = true
+      }
     }
-  },
-  git = {
-    ignore = false
-  },
-  renderer = {
-    icons = {
-      show = {
-        file = true,
-        folder = false,
-        folder_arrow = true,
-        git = true,
-      },
-      glyphs = {
-        default = " ",
-        git = {
-          unstaged = "☐",
-          staged = "☑",
-          unmerged = "",
-          deleted = "☒"
-        },
-        folder = {
-          arrow_closed = "•",
-          arrow_open = "‣",
-        },
-      },
-      webdev_colors = false,
-    },
-    highlight_git = true,
-    indent_markers = {
-      enable = true,
-      icons = {
-        corner = "└",
-        edge = "│",
-        item = "│",
-        none = " ",
-      },
-    },
-  },
-  filters = {
-    dotfiles = true
-  }
-}
 
 -- nvim.api.nvim_command('autocmd CursorHoldI * silent! lua vim.lsp.buf.signature_help()')
 

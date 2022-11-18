@@ -1,8 +1,9 @@
 set nocompatible
-filetype off
 filetype plugin indent on
 
 if has('nvim')
+  let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+
   "Load plugins
   lua require("plugins")
 
@@ -10,9 +11,6 @@ if has('nvim')
  nnoremap <silent> <C-c> <C-c> :ConjureEvalCurrentForm<CR>
 
  inoremap <silent><expr> <C-Space> compe#complete()
- inoremap <silent><expr> <C-k> pumvisible() ? "\<Up>" : "\<C-k>"
- inoremap <silent><expr> <C-j> pumvisible() ? "\<Down>" : "\<C-j>"
-
  set signcolumn=yes
 endif
 
@@ -22,9 +20,6 @@ if exists("g:neovide")
   let g:neovide_scroll_animation_length=0.1
   set guifont=PragmataPro\ Mono\ Liga:h16
 endif
-
-" NVIM
-let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 
 " Space is leader key
 nnoremap <Space> <Nop>
@@ -72,11 +67,10 @@ nnoremap <M-w> :b2<CR>
 nnoremap <M-e> :b3<CR>
 nnoremap <M-r> :b4<CR>
 nnoremap <M-t> :b5<CR>
+inoremap jk <Esc>
 
 " save session
 nnoremap <leader>s :mksession<CR>
-
-inoremap jk <Esc>
 
 " UI
 set hidden
@@ -163,7 +157,7 @@ set path=**
 nnoremap <silent> // :noh<CR>
 
 " Ignore these files
-set wildignore+=*.zip,*.png,*.gif,*.pdf,*DS_Store*,*/.git/*,*/node_modules/*,yarn.lock
+set wildignore+=*.zip,*.png,*.gif,*.pdf,*DS_Store*,*/.git/*,*/node_modules/*,yarn.lock,package-lock.json
 
 " Quickscope
 let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
@@ -172,16 +166,6 @@ augroup qa_colors
   hi QuickScopePrimary guifg=#282828 guibg=#8ec07c gui=bold ctermfg=167 cterm=underline
   hi QuickScopeSecondary guifg=#282828 guibg=#fabd2f gui=bold ctermfg=214 cterm=underline
 augroup END
-
-" Sneak
-" let g:sneak#label = 1
-" let g:sneak#s_next = 1
-" let g:sneak#use_ic_scs = 1 "Case insensitive
-" augroup sneak_colors
-"   hi Sneak guifg=#282828 guibg=#fb4934 gui=bold ctermfg=black ctermbg=cyan
-"   hi SneakScope guifg=#282828 guibg=#8ec07c gui=bold ctermfg=red ctermbg=yellow
-"   hi SneakLabel guifg=#282828 guibg=#fabd2f gui=bold
-" augroup END
 
 " Movement
 nnoremap j gj
@@ -214,10 +198,9 @@ set lazyredraw
 set wildignorecase
 set wrap
 
-
 " Column
-set textwidth=200
-set colorcolumn=111
+set textwidth=80
+set colorcolumn=79
 
 " Path
 let &path.="src/include,/usr/include/AL,"
