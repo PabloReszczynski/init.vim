@@ -98,5 +98,6 @@ return require('packer').startup(function(use)
   use 'SmiteshP/nvim-gps'                   -- Show AST cursor
   use 'ggandor/leap-ast.nvim'               -- Hop around AST
   use 'folke/lsp-colors.nvim'
-  use 'ellisonleao/gruvbox.nvim'           -- Gruvbox colorscheme
+  use 'ellisonleao/gruvbox.nvim'            -- Gruvbox colorscheme
+  use 'L3MON4D3/LuaSnip'                    -- Snippets engine
 end)

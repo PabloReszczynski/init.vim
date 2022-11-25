@@ -1,18 +1,16 @@
 set nocompatible
 filetype plugin indent on
 
-if has('nvim')
-  let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 
-  "Load plugins
-  lua require("plugins")
+"Load plugins
+lua require("plugins")
 
- " LSP config
- nnoremap <silent> <C-c> <C-c> :ConjureEvalCurrentForm<CR>
+" LSP config
+nnoremap <silent> <C-c> <C-c> :ConjureEvalCurrentForm<CR>
 
- inoremap <silent><expr> <C-Space> compe#complete()
- set signcolumn=yes
-endif
+inoremap <silent><expr> <C-Space> compe#complete()
+set signcolumn=yes
 
 " Neovide configuration
 if exists("g:neovide")
@@ -80,14 +78,13 @@ set showtabline=0
 set showcmd
 set wildmenu
 set wildmode=list:longest,full
-set guicursor=n-v-c-sm:block,i-ci-ve:block,r-cr-o:hor20
+set guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20
 set ruler
 set laststatus=3
 set noshowmode
 set diffopt+=linematch:60,algorithm:patience,vertical
-if has('nvim')
-  set inccommand=nosplit
-endif
+set noeb
+set inccommand=nosplit
 
 " Status line
 set statusline+=%{get(b:,'gitsigns_status','')}
@@ -100,44 +97,22 @@ augroup numbertoggle
   autocmd BufLeave,FocusLost,InsertEnter,WinLeave * if &nu | set nornu | endif
 augroup END
 
-"if strftime("%H") < 18
-if 0
-  set background=light
-  let $BAT_THEME="gruvbox-light"
-  let $FZF_DEFAULT_OPTS="
-        \ --color=fg:#3c3836,bg:#f2e5bc,hl:#458588
-        \ --color=fg+:#282828,bg+:#fbf1c7,hl+:#076678
-        \ --color=info:#d79921,prompt:#cc241d,pointer:#b16286
-        \ --color=marker:#98971a,spinner:#b16286,header:#7c6f64"
-  lua require("gruvbox").setup({ contrast = "soft" })
-
-else
-  set background=dark
-  let $BAT_THEME="gruvbox-dark"
-  let $FZF_DEFAULT_OPTS="
-        \ --color=fg:#ebdbb2,bg:#282828,hl:#458588
-        \ --color=fg+:#f2e5bc,bg+:#32302f,hl+:#076678
-        \ --color=info:#d79921,prompt:#cc241d,pointer:#b16286
-        \ --color=marker:#98971a,spinner:#b16286,header:#7c6f64"
-  lua require("gruvbox").setup({ contrast = "hard" })
-endif
-
+" Theme
+set background=light
+lua << EOF
+require("gruvbox").setup({
+  contrast = "soft",
+  italic = true,
+  bold = true,
+})
+EOF
 colorscheme gruvbox
 
-if has("nvim")
-  set termguicolors
-endif
+set termguicolors
 if has("gui_running")
   set guifont=PragmataPro\ Mono\ Liga:h16
   autocmd! GUIEnter * set vb t_vb=
 endif
-let g:gruvbox_contrast_dark='hard'
-let g:gruvbox_contrast_light='soft'
-let g:gruvbox_italic=1
-let g:gruvbox_bold=1
-let g:gruvbox_style='night'
-
-hi Comment cterm=italic term=italic gui=italic guifg=DarkGray
 
 " Neovide config
 let g:neovide_cursor_animation_length=0
@@ -200,7 +175,7 @@ set wrap
 
 " Column
 set textwidth=80
-set colorcolumn=79
+set colorcolumn=80
 
 " Path
 let &path.="src/include,/usr/include/AL,"
@@ -245,7 +220,7 @@ set listchars=tab:-→,eol:¬,extends:↩,precedes:↪,trail:·
 " Autoreload
 augroup reload_vimrc
   autocmd!
-  autocmd BufWritePost $MYVIMRC source $MYVIMRC
+  autocmd BufWritePost $MYVIMRC source $MYVIMRC :luafile $MYVIMRC
 augroup END
 
 " GVIm
@@ -293,11 +268,9 @@ let g:nv_search_paths = ['~/notes']
 let g:vimwiki_list = [{'path': '~/.vimwiki/', 'syntax': 'markdown', 'ext': '.md'}]
 
 " Lua functions
-if has('nvim')
-   lua require('init')
+lua require('init')
 
-   augroup packer_user_config
-     autocmd!
-     autocmd BufWritePost plugins.lua source <afile> | PackerCompile
-   augroup end
-endif
+augroup packer_user_config
+ autocmd!
+ autocmd BufWritePost plugins.lua source <afile> | PackerCompile
+augroup end
