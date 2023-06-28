@@ -1,6 +1,94 @@
+-- disable netrw at the very start of your init.lua (strongly advised)
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+-- Project.nvim
+require("project_nvim").setup({})
+
+-- Telescope
+require("telescope").setup({
+  fzf = {
+    fuzzy = true,
+    override_generic_sorter = true, -- override the generic sorter
+    override_file_sorter = true,    -- override the file sorter
+    case_mode = "smart_case",       -- or "ignore_case" or "respect_case"
+  },
+  defaults = {
+    mappings = {
+      i = {
+        ["<C-j>"] = require("telescope.actions").move_selection_next,
+        ["<C-k>"] = require("telescope.actions").move_selection_previous,
+      },
+    },
+    layout_strategy = "horizontal",
+  },
+  extensions = {
+    ["ui-select"] = {
+      layout_strategy = "cursor",
+      layout_config = {
+        width = 0.4,
+        height = 0.3,
+      },
+    },
+  },
+})
+
+local telescope = require("telescope")
+telescope.load_extension("fzf")
+telescope.load_extension("notify")
+telescope.load_extension("projects")
+telescope.load_extension("ui-select")
+
+-- Noice
+-- require("noice").setup({
+
+-- })
+
+-- NV
+-- require("neuron").setup({
+--   virtual_titles = true,
+--   mappings = true,
+--   run = nil, -- function to run when in neuron dir
+--   neuron_dir = "~/neuron", -- the directory of all of your notes, expanded by default (currently supports only one directory for notes, find a way to detect neuron.dhall to use any directory)
+--   leader = "gz", -- the leader key to for all mappings, remember with 'go zettel'
+-- })
+
+-- Treesitter
 local treesitter_config = require("nvim-treesitter.configs")
 local treesitter_install = require("nvim-treesitter.install")
-require("gitsigns").setup()
+
+-- Gitsignes
+require("gitsigns").setup({
+  current_line_blame = true,
+  on_attach = function(bufnr)
+    local gs = package.loaded.gitsigns
+    local function map(mode, l, r, opts)
+      opts = opts or {}
+      opts.buffer = bufnr
+      vim.keymap.set(mode, l, r, opts)
+    end
+
+    map("n", "]c", function()
+      if vim.wo.diff then
+        return "]c"
+      end
+      vim.schedule(function()
+        gs.next_hunk()
+      end)
+      return "<Ignore>"
+    end, { expr = true })
+
+    map("n", "[c", function()
+      if vim.wo.diff then
+        return "[c"
+      end
+      vim.schedule(function()
+        gs.prev_hunk()
+      end)
+      return "<Ignore>"
+    end, { expr = true })
+  end,
+})
 
 -- Line diagnostics
 local show_line_diagnostics = function()
@@ -11,12 +99,8 @@ local show_line_diagnostics = function()
 end
 
 local on_attach = function(_, bufnr)
-  local function buf_keymap(mode, keys, callback)
-    vim.api.nvim_buf_set_keymap(bufnr, mode, keys, "", {
-      noremap = true,
-      silent = true,
-      callback = callback,
-    })
+  local function buf_keymap(mode, keymap, callback)
+    vim.keymap.set(mode, keymap, callback, { buffer = bufnr, noremap = true })
   end
 
   local function buf_set_option(...)
@@ -25,18 +109,43 @@ local on_attach = function(_, bufnr)
 
   buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
 
-  buf_keymap("n", "<leader> gd", vim.lsp.buf.declaration)
+  buf_keymap("n", "gD", vim.lsp.buf.declaration)
   buf_keymap("n", "gd", vim.lsp.buf.definition)
   buf_keymap("n", "K", vim.lsp.buf.hover)
-  buf_keymap("n", "gD", vim.lsp.buf.implementation)
+  buf_keymap("n", "C-k", vim.lsp.buf.signature_help)
+  buf_keymap("i", "C-k", vim.lsp.buf.signature_help)
+  buf_keymap("n", "gi", require("telescope.builtin").lsp_implementations)
+  buf_keymap("n", "gr", vim.lsp.buf.references)
   buf_keymap("n", "<leader> rn", vim.lsp.buf.rename)
-  buf_keymap("n", "<c-a>", vim.lsp.buf.code_action)
+  buf_keymap("n", "<C-a>", vim.lsp.buf.code_action)
   buf_keymap("n", "<leader>=", function()
-    vim.lsp.buf.format({}, 5000)
+    vim.lsp.buf.format({ timeout_ms = 5000 })
   end)
   buf_keymap("n", "J", show_line_diagnostics)
   buf_keymap("n", "[d", vim.diagnostic.goto_prev)
   buf_keymap("n", "]d", vim.diagnostic.goto_next)
+
+  vim.api.nvim_create_autocmd({ "InsertEnter" }, {
+    buffer = bufnr,
+    callback = function()
+      vim.lsp.buf.inlay_hint(bufnr, true)
+    end,
+  })
+  vim.api.nvim_create_autocmd({ "InsertLeave" }, {
+    buffer = bufnr,
+    callback = function()
+      vim.lsp.buf.inlay_hint(bufnr, false)
+    end,
+  })
+
+  -- Set tab config again because a plugin is resetting it for some reason
+  vim.bo[bufnr].tabstop = 2
+  vim.bo[bufnr].softtabstop = 2
+  vim.bo[bufnr].shiftwidth = 2
+  vim.bo[bufnr].expandtab = true
+  vim.bo[bufnr].autoindent = true
+  vim.bo[bufnr].smartindent = true
+  vim.o.smarttab = true
 end
 
 -- vim.keymap.set({'n', 'x', 'o'}, 'x', function() require'leap-ast'.leap() end, {})
@@ -61,7 +170,7 @@ nls.setup({
     nls.builtins.diagnostics.eslint.with({
       prefer_local = "node_modules/.bin",
     }),
-    nls.builtins.formatting.prettier.with({
+    nls.builtins.formatting.eslint.with({
       prefer_local = "node_modules/.bin",
     }),
 
@@ -78,6 +187,9 @@ nls.setup({
 
     -- Swift
     nls.builtins.formatting.swiftformat,
+
+    -- Racket
+    nls.builtins.formatting.racket_fixw,
   },
 })
 
@@ -99,24 +211,30 @@ local lsp_servers = {
   "texlab",
   "clojure_lsp",
   "sourcekit",
-  "rescriptls",
   "sourcekit",
   "ltex",
-  "sumneko_lua",
+  "lua_ls",
+  "tailwindcss",
 }
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] =
-vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-  underline = true,
-  virtual_text = false,
-  signs = true,
-  update_in_insert = false,
-})
+    vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+      underline = true,
+      virtual_text = false,
+      signs = true,
+      update_in_insert = false,
+    })
 
 vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
   width = 80,
   border = "single",
 })
+
+vim.lsp.handlers["textDocument/signatureHelp"] =
+    vim.lsp.with(vim.lsp.handlers.signature_help, {
+      border = "single",
+      close_events = { "CursorMoved", "BufHidden", "InsertCharPre" },
+    })
 
 -- vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signatureHelp, {
 --   border = 'single'
@@ -130,19 +248,37 @@ for _, server in ipairs(lsp_servers) do
         on_attach(client, bufr)
       end,
       capabilities = capabilities,
-    })
-  elseif server == "rescriptls" then
-    nvim_lsp[server].setup({
-      on_attach = on_attach,
-      cmd = {
-        "node",
-        "/Users/p/repos/rescript-vscode/server/out/server.js",
-        "--stdio",
+      settings = {
+        typescript = {
+          inlayHints = {
+            includeInlayParameterNameHints = "all",
+            includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+            includeInlayFunctionParameterTypeHints = true,
+            includeInlayVariableTypeHints = true,
+            includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+            includeInlayPropertyDeclarationTypeHints = true,
+            includeInlayFunctionLikeReturnTypeHints = true,
+            includeInlayEnumMemberValueHints = true,
+          },
+        },
+        javascript = {
+          inlayHints = {
+            includeInlayParameterNameHints = "all",
+            includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+            includeInlayFunctionParameterTypeHints = true,
+            includeInlayVariableTypeHints = true,
+            includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+            includeInlayPropertyDeclarationTypeHints = true,
+            includeInlayFunctionLikeReturnTypeHints = true,
+            includeInlayEnumMemberValueHints = true,
+          },
+        },
       },
     })
   elseif server == "rust_analyzer" then
     nvim_lsp[server].setup({
       on_attach = on_attach,
+      capabilities = capabilities,
       settings = {
         ["rust-analyzer"] = {
           checkOnSave = {
@@ -159,11 +295,15 @@ for _, server in ipairs(lsp_servers) do
         },
       },
     })
-  elseif server == "sumneko_lua" then
+  elseif server == "lua_ls" then
     nvim_lsp[server].setup({
+      on_attach = on_attach,
+      capabilities = capabilities,
       settings = {
         Lua = {
-          version = "LuaJIT",
+          runtime = {
+            version = "LuaJIT",
+          },
           diagnostics = {
             globals = { "vim" },
           },
@@ -176,28 +316,49 @@ for _, server in ipairs(lsp_servers) do
         },
       },
     })
+  elseif server == "gopls" then
+    nvim_lsp[server].setup({
+      on_attach = on_attach,
+      filetypes = { "go", "gomod" },
+      cmd = {
+        "gopls",
+        "--remote.debug=:0",
+      },
+      flags = {
+        allow_incremental_sync = true,
+        debounce_text_changes = 150,
+      },
+      settings = {
+        gopls = {
+          analyses = {
+            unusedparams = true,
+          },
+          experimentalPostfixCompletions = true,
+          codelenses = {
+            test = true,
+            tidy = true,
+            upgrade_dependency = true,
+            vendor = true,
+            generate = true,
+            gc_details = true,
+          },
+          usePlaceholders = true,
+          completeUnimported = true,
+          staticcheck = true,
+          matcher = "fuzzy",
+          diagnosticsDelay = "500ms",
+          symbolMatcher = "fuzzy",
+          semanticTokens = true,
+        },
+      },
+    })
   else
     nvim_lsp[server].setup({
       on_attach = on_attach,
+      capabilities = capabilities,
     })
   end
 end
-
--- Dressing
-require("dressing").setup({
-  enabled = true,
-  select = {
-    enabled = true,
-    fzf = {
-      window = {
-        width = 0.5,
-        height = 0.4,
-      },
-    },
-  },
-})
-
-require("fzf_lsp").setup()
 
 local cmp = require("cmp")
 cmp.setup({
@@ -211,8 +372,8 @@ cmp.setup({
     { name = "buffer" },
     { name = "path" },
     { name = "luasnip" },
+    { name = "conjure" },
   }),
-
   mapping = cmp.mapping.preset.insert({
     ["<C-b>"] = cmp.mapping.scroll_docs(-4),
     ["<C-f>"] = cmp.mapping.scroll_docs(4),
@@ -220,13 +381,44 @@ cmp.setup({
     ["<C-e>"] = cmp.mapping.abort(),
     ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
   }),
+
+  sorting = {
+    comparators = {
+      cmp.config.compare.offset,
+      cmp.config.compare.exact,
+      cmp.config.compare.score,
+
+      function(entry1, entry2)
+        local _, entry1_under = entry1.completion_item.label:find("^_+")
+        local _, entry2_under = entry2.completion_item.label:find("^_+")
+        entry1_under = entry1_under or 0
+        entry2_under = entry2_under or 0
+
+        if entry1_under > entry2_under then
+          return false
+        elseif entry1_under < entry2_under then
+          return true
+        end
+      end,
+
+      cmp.config.compare.kind,
+      cmp.config.compare.sort_text,
+      cmp.config.compare.length,
+      cmp.config.compare.order,
+    },
+  },
+
+  experimental = {
+    native_menu = false,
+    ghost_text = true,
+  },
 })
 
 treesitter_config.setup({
   ignore_install = { "haskell", "lua", "latex" },
   highlight = {
     enable = true,
-    disable = { "haskell", "lua", "latex" },
+    disable = { "latex" },
   },
   rainbow = {
     enable = true,
@@ -294,21 +486,12 @@ treesitter_config.setup({
       },
     },
   },
+  indent = {
+    enable = true,
+  },
 })
 
 treesitter_install.prefer_git = true
-
-require("lspfuzzy").setup({})
-
-local time = vim.fn["strftime"]("%H")
-
-local theme = function(time)
-  if time < 18 then
-    return "gruvbox_light"
-  else
-    return "gruvbox"
-  end
-end
 
 -- Lunaline
 require("lualine").setup({
@@ -342,15 +525,15 @@ require("lualine").setup({
 
 -- Nvim tree
 require("nvim-tree").setup({
+  sync_root_with_cwd = true,
+  respect_buf_cwd = true,
+  update_focused_file = {
+    enable = true,
+    update_root = true,
+  },
   diagnostics = {
     enable = true,
     show_on_dirs = true,
-    icons = {
-      hint = "⧱",
-      info = "⧯",
-      warning = "⚠",
-      error = "⚠",
-    },
   },
   git = {
     ignore = false,
@@ -358,35 +541,16 @@ require("nvim-tree").setup({
   renderer = {
     icons = {
       show = {
-        file = true,
+        file = false,
         folder = false,
-        folder_arrow = true,
-        git = true,
+        folder_arrow = false,
+        git = false,
       },
-      glyphs = {
-        default = " ",
-        git = {
-          unstaged = "☐",
-          staged = "☑",
-          unmerged = "",
-          deleted = "☒",
-        },
-        folder = {
-          arrow_closed = "•",
-          arrow_open = "‣",
-        },
-      },
-      webdev_colors = true,
     },
     highlight_git = true,
+    highlight_opened_files = "name",
     indent_markers = {
       enable = true,
-      icons = {
-        corner = "└",
-        edge = "│",
-        item = "│",
-        none = " ",
-      },
     },
   },
   filters = {
@@ -434,3 +598,62 @@ vim.keymap.set(
   ":Vista finder<CR>",
   { silent = true, remap = true }
 )
+
+-- DAP
+local dap = require("dap")
+dap.adapters.python = {
+  type = "executable",
+  command = "python",
+  args = { "-m", "debugpy.adapter" },
+}
+
+dap.configurations.python = {
+  {
+    type = "python",
+    request = "launch",
+    name = "Launch file",
+    program = "${file}",
+  },
+}
+
+require("dapui").setup({})
+
+-- VimWiki
+
+vim.g.vimwiki_list = {
+  {
+    path = "~/vimwiki/",
+    syntax = "markdown",
+    ext = ".md",
+  },
+  {
+    path = "~/book/wiki",
+    syntax = "markdown",
+    ext = ".md",
+  },
+}
+
+require("indent-o-matic").setup({
+  -- The values indicated here are the defaults
+
+  -- Number of lines without indentation before giving up (use -1 for infinite)
+  max_lines = 2048,
+
+  -- Space indentations that should be detected
+  standard_widths = { 2, 4, 8 },
+
+  -- Skip multi-line comments and strings (more accurate detection but less performant)
+  skip_multiline = true,
+})
+
+require("neotest").setup({
+  adapters = {
+    require("neotest-python")({
+      dap = { justMyCode = false },
+      runner = "pytest",
+    }),
+    require("neotest-plenary"),
+  },
+})
+
+require('numb').setup()

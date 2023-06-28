@@ -47,9 +47,12 @@ nnoremap <leader><tab> :b#<CR>
 " nnoremap <leader>tt :tabnew<CR>
 " nnoremap <leader>tn :tabnext<CR>
 " nnoremap <leader>tp :tabprevious<CR>
-nnoremap <silent> <leader>ff :Files<CR>
-nnoremap <silent> <leader>bb :Buffers<CR>
-nnoremap <silent> <leader>aa :Rg<CR>
+nnoremap <silent> <leader>ff <cmd>Telescope find_files<CR>
+nnoremap <silent> <leader>fb <cmd>Telescope buffers<CR>
+nnoremap <silent> <leader>fa <cmd>Telescope live_grep<CR>
+nnoremap <silent> <leader>fh <cmd>Telescope help_tags<CR>
+nnoremap <silent> <leader>fp <cmd>Telescope projects<CR>
+nnoremap <silent> z= <cmd> Telescope spell_suggest<CR>
 nnoremap <silent> <leader>ft :NvimTreeToggle <CR>
 nnoremap <silent> <leader>q :bd<CR>
 vnoremap <silent> . :norm . <CR>
@@ -99,12 +102,15 @@ augroup END
 
 " Theme
 set background=light
+
 lua << EOF
-require("gruvbox").setup({
-  contrast = "soft",
-  italic = true,
-  bold = true,
-})
+  require("gruvbox").setup({
+    contrast = "soft",
+    bold = true,
+    italic = {
+      comments = true,
+    },
+  })
 EOF
 colorscheme gruvbox
 
@@ -142,6 +148,8 @@ augroup qa_colors
   hi QuickScopeSecondary guifg=#282828 guibg=#fabd2f gui=bold ctermfg=214 cterm=underline
 augroup END
 
+hi! link LspInlayHint LspInfoTip
+
 " Movement
 nnoremap j gj
 nnoremap k gk
@@ -161,20 +169,20 @@ vnoremap > >gv
 let g:AutoPairsShortcutFastWrap='<C-e>'
 
 " Editor
+set expandtab
 set tabstop=2
 set softtabstop=2
 set shiftwidth=2
-set expandtab
 set autoindent
 set smartindent
 set smarttab
 set scrolloff=5
-set lazyredraw
+"set lazyredraw
 set wildignorecase
 set wrap
 
 " Column
-set textwidth=80
+set textwidth=0  " don't autowrap text with newlines
 set colorcolumn=80
 
 " Path
@@ -236,18 +244,21 @@ let g:rust_recommended_style=0
 autocmd filetype tex,latex,md,txt,wiki,pandoc setlocal spelllang=es spell complete+=kspell
 
 " Markdown
+autocmd BufNewFile,BufRead *.fountain set filetype=md
 autocmd filetype md,pandoc nmap gd <Plug>(pandoc-keyboard-links-open)
 autocmd filetype md,pandoc setlocal sua+=.md
+autocmd filetype md,pandoc setlocal spelllang=en_us
+autocmd filetype md,pandoc setlocal spell
 
 " Use FZF for z=
-function! FzfSpellSink(word)
-  exe 'normal! "_ciw'.a:word
-endfunction
-function! FzfSpell()
-  let suggestions = spellsuggest(expand("<cword>"))
-  return fzf#run({'source': suggestions, 'sink': function("FzfSpellSink"), 'down': 10})
-endfunction
-nnoremap z= :call FzfSpell()<CR>
+" function! FzfSpellSink(word)
+"   exe 'normal! "_ciw'.a:word
+" endfunction
+" function! FzfSpell()
+"   let suggestions = spellsuggest(expand("<cword>"))
+"   return fzf#run({'source': suggestions, 'sink': function("FzfSpellSink"), 'down': 10})
+" endfunction
+" nnoremap z= :call FzfSpell()<CR>
 
 " ASDF projects
 autocmd BufNewFile,BufRead *.asd set ft=lisp
@@ -261,11 +272,27 @@ au BufNewFile, BufRead *.fs set ft=forth
 " Ocaml
 let g:opamshare=substitute(system('opam config var share'), '\n$', '', '''')
 
-" Notional FZF
-let g:nv_search_paths = ['~/notes']
+" Open binary files with xxd
+augroup Binary
+  au!
+  au BufReadPre  *.bin setlocal bin
+  au BufReadPost *.bin if &bin | %!xxd
+  au BufReadPost *.bin set ft=xxd | endif
+  au BufWritePre *.bin if &bin | %!xxd -r
+  au BufWritePre *.bin endif
+  au BufWritePost *.bin if &bin | %!xxd
+  au BufWritePost *.bin set nomod | endif
+augroup END
 
-" Vimwiki
-let g:vimwiki_list = [{'path': '~/.vimwiki/', 'syntax': 'markdown', 'ext': '.md'}]
+" Notional FZF
+"let g:nv_search_paths = ['~/notes']
+
+" Journaling
+augroup JournalSyntax
+  autocmd!
+  autocmd BufReadPost ~/journal/* set filetype=journal syntax=journal
+augroup END
+
 
 " Lua functions
 lua require('init')
