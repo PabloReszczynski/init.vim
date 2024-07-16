@@ -6,18 +6,8 @@ let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 "Load plugins
 lua require("plugins")
 
-" LSP config
-nnoremap <silent> <C-c> <C-c> :ConjureEvalCurrentForm<CR>
-
 inoremap <silent><expr> <C-Space> compe#complete()
 set signcolumn=yes
-
-" Neovide configuration
-if exists("g:neovide")
-  let g:neovide_refresh_rate=60
-  let g:neovide_scroll_animation_length=0.1
-  set guifont=PragmataPro\ Mono\ Liga:h16
-endif
 
 " Space is leader key
 nnoremap <Space> <Nop>
@@ -50,13 +40,12 @@ nnoremap <leader><tab> :b#<CR>
 nnoremap <silent> <leader>ff <cmd>Telescope find_files<CR>
 nnoremap <silent> <leader>fb <cmd>Telescope buffers<CR>
 nnoremap <silent> <leader>fa <cmd>Telescope live_grep<CR>
-nnoremap <silent> <leader>fh <cmd>Telescope help_tags<CR>
+nnoremap <silent> <leader>fh <cmd>Telescope search_history<CR>
 nnoremap <silent> <leader>fp <cmd>Telescope projects<CR>
 nnoremap <silent> z= <cmd> Telescope spell_suggest<CR>
 nnoremap <silent> <leader>ft :NvimTreeToggle <CR>
 nnoremap <silent> <leader>q :bd<CR>
 vnoremap <silent> . :norm . <CR>
-nnoremap <C-s> :%s//g<Left><Left>
 nnoremap <leader>gs :G <CR>
 " nnoremap <C-j> 3<C-e>
 " nnoremap <C-k> 3<C-y>
@@ -100,28 +89,11 @@ augroup numbertoggle
   autocmd BufLeave,FocusLost,InsertEnter,WinLeave * if &nu | set nornu | endif
 augroup END
 
-" Theme
-set background=light
-
-lua << EOF
-  require("gruvbox").setup({
-    contrast = "soft",
-    bold = true,
-    italic = {
-      comments = true,
-    },
-  })
-EOF
-colorscheme gruvbox
-
 set termguicolors
 if has("gui_running")
   set guifont=PragmataPro\ Mono\ Liga:h16
   autocmd! GUIEnter * set vb t_vb=
 endif
-
-" Neovide config
-let g:neovide_cursor_animation_length=0
 
 " Cursorline
 set cursorline
@@ -143,10 +115,10 @@ set wildignore+=*.zip,*.png,*.gif,*.pdf,*DS_Store*,*/.git/*,*/node_modules/*,yar
 " Quickscope
 let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
 
-augroup qa_colors
-  hi QuickScopePrimary guifg=#282828 guibg=#8ec07c gui=bold ctermfg=167 cterm=underline
-  hi QuickScopeSecondary guifg=#282828 guibg=#fabd2f gui=bold ctermfg=214 cterm=underline
-augroup END
+" augroup qa_colors
+"   hi QuickScopePrimary guifg=#282828 guibg=#8ec07c gui=bold ctermfg=167 cterm=underline
+"   hi QuickScopeSecondary guifg=#282828 guibg=#fabd2f gui=bold ctermfg=214 cterm=underline
+" augroup END
 
 hi! link LspInlayHint LspInfoTip
 
@@ -293,11 +265,40 @@ augroup JournalSyntax
   autocmd BufReadPost ~/journal/* set filetype=journal syntax=journal
 augroup END
 
+" "Aliases" for commonly used commands+lazy shift finger:
+command! -bar -nargs=* -complete=file -range=% -bang W         <line1>,<line2>write<bang> <args>
+command! -bar -nargs=* -complete=file -range=% -bang Write     <line1>,<line2>write<bang> <args>
+command! -bar -nargs=* -complete=file -range=% -bang Wq        <line1>,<line2>wq<bang> <args>
+command! -bar                                  -bang Wqall     wqa<bang>
+command! -bar -nargs=* -complete=file -range=% -bang We        <line1>,<line2>w<bang> | e <args>
+command! -bar -nargs=* -complete=file -count   -bang Wnext     <count>wnext<bang> <args>
+command! -bar -nargs=* -complete=file -count   -bang Wprevious <count>wprevious<bang> <args>
+command! -bar -nargs=* -complete=file          -bang E         edit<bang> <args>
+command! -bar -nargs=* -complete=file          -bang Edit      edit<bang> <args>
+command! -bar                                  -bang Q         quit<bang>
+command! -bar                                  -bang Quit      quit<bang>
+command! -bar                                  -bang Qall      qall<bang>
+command! -bar -nargs=? -complete=option              Set       set <args>
+command! -bar -nargs=? -complete=help                Help      help <args>
+command! -bar -nargs=* -complete=file          -bang Make      make<bang> <args>
+command! -bar -nargs=* -complete=buffer        -bang Bdel      bdel<bang> <args>
+command! -bar -nargs=* -complete=buffer        -bang Bwipe     bwipe<bang> <args>
+command! -bar -nargs=* -complete=file          -bang Mksession mksession<bang> <args>
+command! -bar -nargs=* -complete=dir           -bang Cd        cd<bang> <args>
+command! -bar                                        Messages  messages
+command! -bar -nargs=+ -complete=file          -bang Source    source<bang> <args>
+
+" Use ripgrep instead of grep
+set grepprg=rg\ --vimgrep\ --hidden\ --smart-case
+set grepformat=%f:%l:%c:%m
 
 " Lua functions
 lua require('init')
 
 augroup packer_user_config
  autocmd!
- autocmd BufWritePost plugins.lua source <afile> | PackerCompile
+ autocmd BufWritePost plugins.lua source <afile> | Lazy update
 augroup end
+
+hi TreesitterContextBottom gui=underline guisp=Grey
+hi TreesitterContextLineNumberBottom gui=underline guisp=Grey
