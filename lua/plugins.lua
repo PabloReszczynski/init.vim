@@ -37,7 +37,6 @@ return require("lazy").setup({
   "tpope/vim-repeat",                           -- Repeat last command
   "tpope/vim-eunuch",                           -- Unix commands
   "andymass/vim-matchup",                       -- Match blocks
-  "vimwiki/vimwiki",                            -- Wiki on vim
   "neoclide/jsonc.vim",                         -- Allow comments in JSON
   "machakann/vim-highlightedyank",              -- Highlight yank
   "chaoren/vim-wordmotion",                     -- Word motions work with camelcase
@@ -78,17 +77,21 @@ return require("lazy").setup({
     "ojroques/nvim-lspfuzzy",
     branch = "main",
   },
-  "nvim-lua/plenary.nvim", -- Lua functions
-  "hoob3rt/lualine.nvim",  -- Lua statusline
+  {
+    "nvim-lualine/lualine.nvim",  -- Lua statusline
+    dependencies = { "nvim-tree/nvim-web-devicons", opt = true },
+    lazy = false,
+  },
   -- Tree viewer
   {
-    "kyazdani42/nvim-tree.lua",
+    "nvim-tree/nvim-tree.lua",
     --cmd = {'NvimTreeToggle' },
-    tag = "nightly",                          -- optional, updated every week. (see issue #1193)
+    dependencies = { "nvim-tree/nvim-web-devicons" },
   },
   "norcalli/nvim-colorizer.lua",              -- Color preview
   "mfussenegger/nvim-lint",                   -- Linting
-  "mhartington/formatter.nvim",               -- Formatter
+  --"mhartington/formatter.nvim",               -- Formatter
+  "stevearc/conform.nvim",                    -- Formatter
   "ggandor/leap.nvim",                        -- Motions
   "ggandor/leap-ast.nvim",                    -- Hop around AST
   --"unblevable/quick-scope",                   -- Highlight jump targets
@@ -99,6 +102,15 @@ return require("lazy").setup({
   "github/copilot.vim",                       -- Github Copilot
   "powerman/vim-plugin-AnsiEsc",              -- Ansi escape sequences
   "nacro90/numb.nvim",                        -- Peek lines
-  "rescript-lang/vim-rescript",               -- Rescript
-  "edwinb/idris2-vim"                         -- Idris 2
+  --"rescript-lang/vim-rescript",               -- Rescript
+  --"edwinb/idris2-vim",                        -- Idris 2
+  {
+    "Olical/conjure",
+    ft = { "clojure" },
+  },
+  {
+    "PaterJason/cmp-conjure",
+    ft = { "clojure" },
+    dependencies = { "Olical/conjure", "hrsh7th/nvim-cmp" },
+  }
 })

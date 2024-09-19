@@ -2,7 +2,7 @@
 --
 local lsp_servers = {
   "kotlin_language_server",
-  "tsserver",
+  "ts_ls",
   "rust_analyzer",
   --"pyright",
   --"jedi_language_server",
@@ -14,12 +14,12 @@ local lsp_servers = {
   "clojure_lsp",
   "sourcekit",
   "lua_ls",
-  "ocamllsp",
   "biome",
   "zls",
   "elixirls",
   "rescriptls",
   "sourcekit",
+  "gleam",
 }
 
 
@@ -87,7 +87,7 @@ local enable_inlay_hints = function(bufnr)
   })
 end
 
-local function tsserver(setup)
+local function ts_ls(setup)
   setup({
     on_attach = function(client, bufnr)
       client.server_capabilities["document_formatting"] = false
@@ -129,10 +129,14 @@ local function rust_analyzer(setup)
     capabilities = default_capabilities,
     settings = {
       ["rust-analyzer"] = {
+        diagnostics = {
+          experimental = true,
+        },
         checkOnSave = {
           allFeatures = true,
           overrideCommand = {
             "cargo",
+            "+nightly",
             "clippy",
             "--workspace",
             "--message-format=json",
@@ -254,17 +258,13 @@ local function pylsp(setup)
     capabilities = default_capabilities,
     settings = {
       pylsp = {
-        configurationSources = { "flake8" },
         plugins = {
-          autopep8 = {
-            enabled = false,
-          },
-          flake8 = {
+          ruff = {
             enabled = true,
-          },
-          pydocstyle = {
-            enabled = true,
-          },
+            formatEnabled = true,
+            extendedSelect = { "I" },
+            format = { "I" },
+          }
         }
       }
     }
@@ -303,13 +303,14 @@ local function elixirls(setup)
 end
 
 local lsp_configurations = {
-  tsserver = tsserver,
+  ts_ls = ts_ls,
   rust_analyzer = rust_analyzer,
   lua_ls = lua_ls,
   gopls = gopls,
   hls = hls,
   pylsp = pylsp,
   elixirls = elixirls,
+  ocamllsp = ocamllsp,
 }
 
 local function setup()
