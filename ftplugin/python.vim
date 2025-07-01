@@ -6,3 +6,4 @@ setlocal expandtab
 setlocal autoindent
 setlocal fileformat=unix
 setlocal colorcolumn=80
+setlocal indentkeys-=:

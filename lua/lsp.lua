@@ -1,12 +1,13 @@
 -- LSP Configurations
---
+-- To find more configurations, check:
+-- :h lspconfig-server-configurations
 local lsp_servers = {
   "kotlin_language_server",
   "ts_ls",
   "rust_analyzer",
-  --"pyright",
+  "basedpyright",
   --"jedi_language_server",
-  "pylsp",
+  -- "pylsp",
   "hls",
   "ocamllsp",
   "gopls",
@@ -20,10 +21,12 @@ local lsp_servers = {
   "rescriptls",
   "sourcekit",
   "gleam",
+  "superhtml",
+  -- "tsp-server",
 }
 
 
-local default_capabilities = require("cmp_nvim_lsp").default_capabilities()
+local default_capabilities = require("blink.cmp").get_lsp_capabilities({}, true)
 
 -- Line diagnostics
 local show_line_diagnostics = function()
@@ -34,19 +37,20 @@ local show_line_diagnostics = function()
 end
 
 -- Global on_attach function
-local on_attach = function(_, bufnr)
+local on_attach = function(client, bufnr)
   local function buf_keymap(mode, keymap, callback)
-    vim.keymap.set(mode, keymap, callback, { buffer = bufnr, noremap = true })
+    vim.keymap.set(mode, keymap, callback, { buffer = bufnr, noremap = true, silent = true })
   end
 
-  local function buf_set_option(...)
-    vim.api.nvim_buf_set_option(bufnr, ...)
+  local function buf_set_option(name, value)
+    vim.api.nvim_set_option_value(name, value, { buf = bufnr })
   end
 
   buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
 
   buf_keymap("n", "gD", vim.lsp.buf.declaration)
   buf_keymap("n", "gd", vim.lsp.buf.definition)
+  buf_keymap("n", "gi", vim.lsp.buf.implementation)
   buf_keymap("n", "K", vim.lsp.buf.hover)
   buf_keymap("n", "C-k", vim.lsp.buf.signature_help)
   buf_keymap("i", "C-k", vim.lsp.buf.signature_help)
@@ -54,12 +58,26 @@ local on_attach = function(_, bufnr)
   buf_keymap("n", "gr", vim.lsp.buf.references)
   buf_keymap("n", "<leader>r", vim.lsp.buf.rename)
   buf_keymap("n", "<C-a>", vim.lsp.buf.code_action)
-  buf_keymap("n", "<leader>=", function()
-    vim.lsp.buf.format({ timeout_ms = 5000 })
+
+  if client.server_capabilities.documentFormattingProvider then
+    vim.keymap.set("n", "<leader>=", function()
+      vim.lsp.buf.format({ timeout_ms = 5000 })
+    end, { buffer = bufnr, noremap = false, silent = true })
+  else
+    vim.keymap.set("n", "<leader>=", function()
+      require("conform").format({
+        bufnr = bufnr,
+        lsp_format = "fallback",
+        quiet = true,
+      })
+    end, { buffer = bufnr, noremap = false, silent = true })
+  end
+  buf_keymap("n", "<leader>i", function()
+    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }), { bufnr = bufnr })
   end)
   buf_keymap("n", "J", show_line_diagnostics)
-  buf_keymap("n", "[d", vim.diagnostic.goto_prev)
-  buf_keymap("n", "]d", vim.diagnostic.goto_next)
+  buf_keymap("n", "[d", function() vim.diagnostic.jump({ count = -1, float = true }) end)
+  buf_keymap("n", "]d", function() vim.diagnostic.jump({ count = 1, float = true }) end)
 
   -- Set tab config again because a plugin is resetting it for some reason
   vim.bo[bufnr].tabstop = 2
@@ -72,20 +90,20 @@ local on_attach = function(_, bufnr)
   vim.g.expandtab = true
 end
 
-local enable_inlay_hints = function(bufnr)
-  vim.api.nvim_create_autocmd({ "InsertEnter" }, {
-    buffer = bufnr,
-    callback = function()
-      vim.lsp.buf.inlay_hint(bufnr, true)
-    end,
-  })
-  vim.api.nvim_create_autocmd({ "InsertLeave" }, {
-    buffer = bufnr,
-    callback = function()
-      vim.lsp.buf.inlay_hint(bufnr, false)
-    end,
-  })
-end
+-- local enable_inlay_hints = function(bufnr)
+--   vim.api.nvim_create_autocmd({ "InsertEnter" }, {
+--     buffer = bufnr,
+--     callback = function()
+--       vim.lsp.buf.inlay_hint(bufnr, true)
+--     end,
+--   })
+--   vim.api.nvim_create_autocmd({ "InsertLeave" }, {
+--     buffer = bufnr,
+--     callback = function()
+--       vim.lsp.buf.inlay_hint(bufnr, false)
+--     end,
+--   })
+-- end
 
 local function ts_ls(setup)
   setup({
@@ -260,12 +278,41 @@ local function pylsp(setup)
       pylsp = {
         plugins = {
           ruff = {
-            enabled = true,
-            formatEnabled = true,
-            extendedSelect = { "I" },
-            format = { "I" },
-          }
+            enabled = false,
+          },
+          mypy = {
+            enabled = false,
+            liveIssues = true,
+          },
+          black = {
+            enabled = false,
+          },
+          autopep8 = {
+            enabled = false,
+          },
+          pyflakes = {
+            enabled = false,
+          },
         }
+      }
+    }
+  })
+end
+
+local function basedpyright(setup)
+  setup({
+    on_attach = on_attach,
+    capabilities = default_capabilities,
+    settings = {
+      basedpyright = {
+        analysis = {
+          autoSearchPaths = true,
+          diagnosticMode = "openFilesOnly",
+          typeCheckingMode = "standard",
+        },
+        formatting = {
+          provider = "ruff",
+        },
       }
     }
   })
@@ -311,34 +358,35 @@ local lsp_configurations = {
   pylsp = pylsp,
   elixirls = elixirls,
   ocamllsp = ocamllsp,
+  basedpyright = basedpyright,
 }
 
 local function setup()
-  vim.lsp.handlers["textDocument/publishDiagnostics"] =
-      vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-        underline = true,
-        virtual_text = false,
-        signs = true,
-        update_in_insert = false,
-        float = {
-          format = function(diag)
-            return string.format(
-              "%s (%s) (%s)",
-              diag.message,
-              diag.source,
-              diag.code or diag.user_data.lsp.code
-            )
-          end
-        },
-      })
+  -- vim.lsp.handlers["textDocument/publishDiagnostics"] =
+  --     vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+  --       underline = true,
+  --       virtual_text = false,
+  --       signs = true,
+  --       update_in_insert = false,
+  --       float = {
+  --         format = function(diag)
+  --           return string.format(
+  --             "%s (%s) (%s)",
+  --             diag.message,
+  --             diag.source,
+  --             diag.code or diag.user_data.lsp.code
+  --           )
+  --         end
+  --       },
+  --     })
 
-  vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+  vim.lsp.handlers["textDocument/hover"] = vim.lsp.buf.hover({
     width = 80,
     border = "single",
   })
 
   vim.lsp.handlers["textDocument/signatureHelp"] =
-      vim.lsp.with(vim.lsp.handlers.signature_help, {
+      vim.lsp.buf.signature_help({
         border = "single",
         close_events = { "CursorMoved", "BufHidden", "InsertCharPre" },
       })
