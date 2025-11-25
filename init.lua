@@ -25,11 +25,36 @@ set.foldnestmax = 4
 vim.keymap.set("n", "<Leader><Tab>", ":b<CR>", { noremap = true })
 
 -- Telescope
-vim.keymap.set("n", "<Leader>ff", require("telescope.builtin").find_files, { noremap = true, silent = true })
-vim.keymap.set("n", "<Leader>fb", require("telescope.builtin").buffers, { noremap = true, silent = true })
-vim.keymap.set("n", "<Leader>fa", require("telescope.builtin").live_grep, { noremap = true, silent = true })
-vim.keymap.set("n", "<Leader>fh", require("telescope.builtin").search_history, { noremap = true, silent = true })
-vim.keymap.set("n", "z=", require("telescope.builtin").spell_suggest, { noremap = true, silent = true })
+-- vim.keymap.set("n", "<Leader>ff", require("telescope.builtin").find_files, { noremap = true, silent = true })
+-- vim.keymap.set("n", "<Leader>ff", require("telescope.builtin").find_files, { noremap = true, silent = true })
+-- vim.keymap.set("n", "<Leader>fb", require("telescope.builtin").buffers, { noremap = true, silent = true })
+-- vim.keymap.set("n", "<Leader>fa", require("telescope.builtin").live_grep, { noremap = true, silent = true })
+-- vim.keymap.set("n", "<Leader>fh", require("telescope.builtin").search_history, { noremap = true, silent = true })
+-- vim.keymap.set("n", "z=", require("telescope.builtin").spell_suggest, { noremap = true, silent = true })
+-- MiniPick
+local MiniPick = require("mini.pick")
+MiniPick.setup()
+vim.keymap.set("n", "<Leader>ff",
+  function()
+    MiniPick.builtin.files({ tool = "fd" })
+  end,
+  { noremap = true, silent = true }
+)
+vim.keymap.set("n", "<leader>fb", function()
+    MiniPick.builtin.buffers({
+      sort = function(a, b)
+        return a.modified > b.modified
+      end,
+    })
+  end,
+  { noremap = true, silent = true }
+)
+vim.keymap.set("n", "<Leader>fa",
+  function()
+    MiniPick.builtin.grep_live({ tool = "rg" })
+  end,
+  { noremap = true, silent = true }
+)
 
 -- NvimTree
 vim.keymap.set("n", "<Leader>ft", ":NvimTreeToggle<cr>", { noremap = true, silent = true })
@@ -54,25 +79,38 @@ set.complete = set.complete:append({ "i" })
 set.path = set.path:append({ "**" })
 
 -- Line numbers
---set.nu = set.rnu:get()
-set.rnu = true
-local number_toggle_group = vim.api.nvim_create_augroup("numbertoggle", {})
-vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnter" }, {
+set.number = true
+set.relativenumber = true
+
+local number_toggle_group = vim.api.nvim_create_augroup("LineNumberToggle", { clear = true })
+vim.api.nvim_create_autocmd("InsertEnter", {
   group = number_toggle_group,
   callback = function()
-    if vim.opt.nu:get() and vim.api.mode() ~= "i" then
-      vim.opt.rnu = true
+    set.relativenumber = false
+  end,
+});
+
+vim.api.nvim_create_autocmd("InsertLeave", {
+  group = number_toggle_group,
+  callback = function()
+    set.relativenumber = true
+  end,
+});
+
+vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "WinEnter" }, {
+  group = number_toggle_group,
+  callback = function()
+    if vim.fn.mode() ~= "i" then
+      set.relativenumber = true
     end
   end
 })
 
 
-vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter", "WinLeave" }, {
+vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "WinLeave" }, {
   group = number_toggle_group,
   callback = function()
-    if vim.opt.nu:get() then
-      vim.opt.rnu = false
-    end
+    set.relativenumber = false
   end
 })
 
@@ -171,7 +209,7 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 -- Fountain mode
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "fountain" },
-  callback = function ()
+  callback = function()
     vim.cmd("setlocal ft=markdown")
     vim.cmd("setlocal spell")
     vim.cmd("setlocal spelllang=en_us")
@@ -183,7 +221,7 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
-require("impatient") -- Setup a cache for faster startup
+-- require("impatient") -- Setup a cache for faster startup
 
 -- Treesitter
 local treesitter_config = require("nvim-treesitter.configs")
