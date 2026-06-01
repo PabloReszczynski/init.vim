@@ -14,19 +14,21 @@ function M.setup()
         ["rust-analyzer"] = {
           diagnostics = {
             experimental = true,
+            enable = true,
           },
-          checkOnSave = {
-            allFeatures = true,
-            overrideCommand = {
-              "cargo",
-              "+nightly",
-              "clippy",
-              "--workspace",
-              "--message-format=json",
-              "--all-targets",
-              "--all-features",
-            },
-          }
+          checkOnSave = true,
+          -- checkOnSave = {
+          --   allFeatures = true,
+          --   overrideCommand = {
+          --     "cargo",
+          --     "+nightly",
+          --     "clippy",
+          --     "--workspace",
+          --     "--message-format=json",
+          --     "--all-targets",
+          --     "--all-features",
+          --   },
+          -- }
         }
       }
     })

@@ -12,25 +12,6 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 return require("lazy").setup({
-  -- UI improvements
-  -- {
-  --   "stevearc/dressing.nvim",
-  --   config = function()
-  --     require("dressing").setup({
-  --       input = {
-  --         enabled = true,
-  --         border = "single",
-  --       },
-  --       select = {
-  --         telescope = require("telescope.themes").get_ivy(),
-  --         builtin = {
-  --           border = "single"
-  --         }
-  --       },
-  --     })
-  --   end
-  -- },
-  -- "lewis6991/impatient.nvim", -- Speed up startup
   -- Better marks
   {
     "chentoast/marks.nvim",
@@ -81,109 +62,22 @@ return require("lazy").setup({
   "tpope/vim-repeat",    -- Repeat last command
   -- "tpope/vim-eunuch",              -- Unix commands
   -- "andymass/vim-matchup",          -- Match blocks
-  -- "neoclide/jsonc.vim",            -- Allow comments in JSON
   "machakann/vim-highlightedyank", -- Highlight yank
   "chaoren/vim-wordmotion",        -- Word motions work with camelcase
   {
     "echasnovski/mini.pick",       -- Picker
     lazy = false,
   },
-  -- {
-  --   "nvim-telescope/telescope.nvim",
-  --   dependencies = {
-  --     "nvim-lua/plenary.nvim",
-  --   },
-  --   config = function()
-  --     local telescope = require("telescope")
-  --     telescope.setup({
-  --       fzf = {
-  --         fuzzy = true,
-  --         override_generic_sorter = true, -- override the generic sorter
-  --         override_file_sorter = true,    -- override the file sorter
-  --         case_mode = "smart_case",       -- or "ignore_case" or "respect_case"
-  --       },
-  --       defaults = {
-  --         mappings = {
-  --           i = {
-  --             ["<C-j>"] = require("telescope.actions").move_selection_next,
-  --             ["<C-k>"] = require("telescope.actions").move_selection_previous,
-  --           },
-  --         },
-  --         layout_strategy = "horizontal",
-  --       },
-  --       extensions = {
-  --         ["ui-select"] = {
-  --           layout_strategy = require("telescope.themes").get_ivy().layout_config.strategy,
-  --           layout_config = {
-  --             width = 0.4,
-  --             height = 0.3,
-  --           },
-  --         },
-  --       },
-  --       pickers = {
-  --         buffers = {
-  --           theme = "ivy",
-  --         },
-  --         find_files = {
-  --           theme = "ivy",
-  --         },
-  --         live_grep = {
-  --           theme = "ivy",
-  --         },
-  --         spell_suggest = {
-  --           theme = "ivy",
-  --         },
-  --       },
-  --     })
-  --     telescope.load_extension("ui-select")
-  --   end
-  -- },                                         -- Fuzzy finding
-  -- "nvim-telescope/telescope-ui-select.nvim", -- Use telescope for actions
-  -- {
-  --   "nvim-telescope/telescope-fzf-native.nvim",
-  --   build =
-  --   "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
-  -- },
   --"/usr/local/opt/ripgrep",       -- Better than ag
-  -- "vim-pandoc/vim-pandoc",        -- Markdown
-  -- "vim-pandoc/vim-pandoc-syntax", -- Markdown syntax
-  {
-    "MeanderingProgrammer/render-markdown.nvim", -- Markdown syntax
-    config = function()
-      require("render-markdown").setup({
-        completions = {
-          blink = {
-            enabled = true,
-          }
-        }
-      })
-    end
-  },
-  "kblin/vim-fountain", -- Fountain syntax
-  -- {
-  --   "folke/zen-mode.nvim", -- Distraction free writing
-  --   opts = {
-  --     window = {
-  --       options = {
-  --         number = false,
-  --       }
-  --     },
-  --     on_open = function()
-  --       vim.cmd("Gitsigns detach_all")
-  --     end,
-  --     on_close = function()
-  --       vim.cmd("Gitsigns attach")
-  --     end,
-  --   }
-  -- },
-  -- "folke/twilight.nvim",   -- Dim inactive portions of text
+  "kblin/vim-fountain",    -- Fountain syntax
   "towolf/vim-helm",       -- Helm templates
-  -- "chrisbra/unicode.vim",  -- Unicode search
   "neovim/nvim-lspconfig", -- Language server protocol configurations.
   {
     "saghen/blink.cmp",
     lazy = false,
-    build = "cargo build --release",
+    build = function()
+      require('blink.cmp').build():wait(60000)
+    end,
     --@module "blink.cmp"
     --@type blink.cmp.Config
     opts = {
@@ -196,19 +90,14 @@ return require("lazy").setup({
         default = {
           "lsp",
           "buffer",
-          "copilot",
         },
-        providers = {
-          copilot = {
-            name = "copilot",
-            module = "blink-copilot",
-            score_offset = 100,
-            async = true,
-          }
-        }
-      }
+      },
     },
-    dependencies = { "fang2hou/blink-copilot" }
+    dependencies = {
+      "saghen/blink.lib",
+      "rafamadriz/friendly-snippets",
+
+    },
   },
   -- Scrollbar with diagnostics
   {
@@ -256,22 +145,58 @@ return require("lazy").setup({
     end
   },
   {
-    -- Code highlight
-    "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate",
-  },
-  "nvim-treesitter/nvim-treesitter-textobjects", -- Textobjects
-  --"hiphish/rainbow-delimiters.nvim", -- Rainbow parens
-  -- Context
-  {
-    "nvim-treesitter/nvim-treesitter-context",
+    "romus204/tree-sitter-manager.nvim",
+    dependencies = {}, -- tree-sitter CLI must be installed system-wide
     config = function()
-      require("treesitter-context").setup({
-        enable = true,
-        max_lines = 1,
+      require("tree-sitter-manager").setup({
+        -- Default Options
+        -- ensure_installed = {}, -- list of parsers to install at the start of a neovim session. If set to "all", install all parsers.
+        -- border = nil, -- border style for the window (e.g. "rounded", "single"), if nil, use the default border style defined by 'vim.o.winborder'. See :h 'winborder' for more info.
+        -- auto_install = false, -- if enabled, install missing parsers when editing a new file
+        -- highlight = true, -- treesitter highlighting is enabled by default
+        -- languages = {}, -- override or add new parser sources
+        ensure_installed = {
+          "lua",
+          "python",
+          "javascript",
+          "typescript",
+          "rust",
+          "go",
+        }
       })
     end
   },
+  --{
+  -- Code highlight
+  --   "nvim-treesitter/nvim-treesitter",
+  --   build = ":TSUpdate",
+  --   branch = "main",
+  --   opts = {
+  --     ensure_installed = {
+  --       "lua",
+  --       "python",
+  --       "javascript",
+  --       "javascriptreact",
+  --       "typescript",
+  --       "typescriptreact",
+  --       "markdown",
+  --     },
+  --     prefer_git = true,
+  --     compilers = { "gcc-14" },
+  --   }
+  -- },
+  -- "nvim-treesitter/nvim-treesitter-textobjects", -- Textobjects
+  --"hiphish/rainbow-delimiters.nvim", -- Rainbow parens
+  -- Context (disabled until upstream nil-node crash on markdown is fixed)
+  -- {
+  --   "nvim-treesitter/nvim-treesitter-context",
+  --   config = function()
+  --     require("treesitter-context").setup({
+  --       enable = true,
+  --       max_lines = 1,
+  --     })
+  --   end
+  -- },
   { -- Lsp search displays in FZF
     "ojroques/nvim-lspfuzzy",
     branch = "main",
@@ -345,6 +270,7 @@ return require("lazy").setup({
   --   end
   -- },
   -- Linting
+  "b0o/schemastore.nvim", -- JSON schema store
   {
     "mfussenegger/nvim-lint",
     config = function()
@@ -361,6 +287,9 @@ return require("lazy").setup({
         lua = { "luacheck" },
         go = { "golangcilint" },
         python = { "ruff" },
+        dockerfile = { "hadolint" },
+        terraform = { "tflint" },
+        ghaction = { "actionlint" },
       }
       lint.linters.luacheck = {
         name = "luacheck",
@@ -403,7 +332,7 @@ return require("lazy").setup({
           javascript = { "biome", "biome-organize-imports" },
           typescript = { "biome", "biome-organize-imports" },
           go = { "gofumpt" },
-          html = { "superhtml", "fmt" },
+          html = { "superhtml" },
         },
       })
       vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
@@ -419,14 +348,14 @@ return require("lazy").setup({
   },
   -- Motions
   {
-    "ggandor/leap.nvim",
+    url = "https://codeberg.org/andyg/leap.nvim",
     config = function()
       local leap = require("leap")
       vim.keymap.set({ 'n', 'x', 'o' }, 's', '<Plug>(leap-forward)', { silent = true })
       vim.keymap.set({ 'n', 'x', 'o' }, 'S', '<Plug>(leap-backward)', { silent = true })
       vim.keymap.set('n', 'gs', '<Plug>(leap-from-window)', { silent = true })
-      vim.keymap.set({'x', 'o'}, 'x', '<Plug>(leap-forward-till)', { silent = true })
-      vim.keymap.set({'x', 'o'}, 'X', '<Plug>(leap-backward-till)', { silent = true })
+      vim.keymap.set({ 'x', 'o' }, 'x', '<Plug>(leap-forward-till)', { silent = true })
+      vim.keymap.set({ 'x', 'o' }, 'X', '<Plug>(leap-backward-till)', { silent = true })
       leap.opts.case_sensitive = false
       leap.opts.max_highlighted_matches = 256
     end
@@ -434,7 +363,7 @@ return require("lazy").setup({
   -- Hop around AST
   {
     "ggandor/leap-ast.nvim",
-    dependencies = { "ggandor/leap.nvim" },
+    dependencies = { "https://codeberg.org/andyg/leap.nvim" },
   },
   -- Themes
   -- Gruvbox colorscheme
@@ -457,67 +386,6 @@ return require("lazy").setup({
       vim.cmd([[colorscheme gruvbox]])
     end,
   },
-  -- "sainnhe/everforest", -- Everforest colorscheme
-  --  Catppuccin colorscheme
-  -- {
-  --   "catppuccin/nvim",
-  --   name = "catppuccin",
-  --   disable = true,
-  --   config = function()
-  --     require("catppuccin").setup({
-  --       background = {
-  --         light = "latte",
-  --         dark = "frappe",
-  --       },
-  --       custom_highlights = function(colors)
-  --         return {
-  --           QuickScopePrimary = { fg = colors.rosewater, underline = true },
-  --           QuickScopeSecondary = { fg = colors.green, underline = true },
-  --           TreesitterContextBottom = { bg = colors.lavender, fg = colors.base, underline = true },
-  --           TreesitterContextLineNumberBottom = { bg = colors.lavender, underline = true },
-  --         }
-  --       end,
-  --       integrations = {
-  --         blink_cmp = true,
-  --         leap = true,
-  --       },
-  --     })
-  --     -- vim.cmd([[colorscheme catppuccin]])
-  --   end
-  -- },
-  {
-    "L3MON4D3/LuaSnip", -- Snippets engine
-    version = "2.*",
-    build = "make install_jsregexp",
-  },
-  -- Github PRs
-  -- {
-  --   "pwntester/octo.nvim",
-  --   config = function()
-  --     require("octo").setup()
-  --   end
-  -- },
-  --"github/copilot.vim",          -- Github Copilot
-  {
-    -- Copilot Replacement in Lua
-    "zbirenbaum/copilot.lua",
-    cmd = "Copilot",
-    event = "InsertEnter",
-    config = function()
-      require("copilot").setup({
-        workspace_folders = {
-          "/Users/p/repos",
-          "/Users/p/topsort",
-        },
-        panel = {
-          enabled = false,
-        },
-        suggestion = {
-          enabled = false,
-        },
-      })
-    end
-  },
   "powerman/vim-plugin-AnsiEsc", -- Ansi escape sequences
   -- Peek lines
   {
@@ -526,11 +394,9 @@ return require("lazy").setup({
       require("numb").setup()
     end
   },
-  --"rescript-lang/vim-rescript",               -- Rescript
-  --"edwinb/idris2-vim",                        -- Idris 2
   {
     "clojure-vim/vim-jack-in", -- Jack in to clojure
-    dependencies = { "tpope/vim-dispatch" }
+    dependencies = { "radenling/vim-dispatch-neovim" }
   },
   {
     "Olical/conjure",

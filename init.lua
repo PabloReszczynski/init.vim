@@ -14,7 +14,7 @@ set.clipboard = "unnamedplus"
 
 -- Folding
 set.foldmethod = "expr"
-set.foldexpr = "nvim_treesitter#foldexpr()"
+set.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 set.foldtext = ""
 set.foldlevel = 99
 --set.foldlevelstart = 0
@@ -155,6 +155,7 @@ vim.keymap.set("n", "k", "gk", { noremap = true })
 -- Better indenting
 vim.keymap.set("v", "<", "<gv", { noremap = true })
 vim.keymap.set("v", ">", ">gv", { noremap = true })
+set.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
 
 -- Editor
 set.expandtab = true
@@ -221,12 +222,6 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
--- require("impatient") -- Setup a cache for faster startup
-
--- Treesitter
-local treesitter_config = require("nvim-treesitter.configs")
-local treesitter_install = require("nvim-treesitter.install")
-
 -- Line diagnostics
 local show_line_diagnostics = function()
   vim.diagnostic.open_float({
@@ -235,80 +230,23 @@ local show_line_diagnostics = function()
   })
 end
 
+-- Providers
+vim.g.loaded_perl_provider = 0    -- Disable Perl
+vim.g.loaded_node_provider = 0    -- Disable Node
+vim.g.loaded_python3_provider = 0 -- Disable Python
+vim.g.loaded_ruby_provider = 0    -- Disable Ruby
+
 -- LSP Configuration
 
 require("lsp").setup()
-
--- @
-treesitter_config.setup({
-  incremental_selection = { enable = true },
-  ignore_install = { "latex" },
-  highlight = {
-    enable = true,
-    disable = { "latex" },
-    additional_vim_regex_highlighting = false,
-  },
-  textobjects = {
-    move = {
-      enable = true,
-      goto_next_start = {
-        ["]m"] = "@function.outer",
-        ["]]"] = "@class.outer",
-      },
-      goto_next_end = {
-        ["]M"] = "@function.outer",
-        ["]["] = "@class.outer",
-      },
-      goto_previous_start = {
-        ["[m"] = "@function.outer",
-        ["[["] = "@class.outer",
-      },
-      goto_previous_end = {
-        ["[M"] = "@function.outer",
-        ["[]"] = "@class.outer",
-      },
-    },
-    lsp_interop = {
-      enable = true,
-    },
-    swap = {
-      enable = true,
-      swap_next = {
-        ["<leader>a"] = "@parameter.inner",
-      },
-      swap_previous = {
-        ["<leader>A"] = "@parameter.inner",
-      },
-    },
-    select = {
-      enable = true,
-      keymaps = {
-        -- You can use the capture groups defined in textobjects.scm
-        ["af"] = "@function.outer",
-        ["if"] = "@function.inner",
-        ["ac"] = "@class.outer",
-        ["ic"] = "@class.inner",
-      },
-    },
-  },
-  indent = {
-    enable = true,
-    disable = { "python" },
-  },
-})
-
-treesitter_install.prefer_git = true
-treesitter_install.compilers = { "gcc-14" }
-
--- nvim.api.nvim_command('autocmd CursorHoldI * silent! lua vim.lsp.buf.signature_help()')
 
 vim.opt.winbar =
 "%#WinBarSeparator# %*%#WinBarContent#%f%*%#WinBarSeparator# %*"
 
 
-vim.keymap.set("n", "[c", function()
-  require("treesitter-context").go_to_context(vim.v.count1)
-end, { silent = true })
+-- vim.keymap.set("n", "[c", function()
+--   require("treesitter-context").go_to_context(vim.v.count1)
+-- end, { silent = true })
 
 -- Opam User setup
 function Setup_opam()
@@ -356,3 +294,56 @@ end
 --         log_notes.toggle()
 --     end
 -- })
+
+-- FT Leap
+do
+  local function as_ft (key_specific_args)
+    local common_args = {
+      inputlen = 1,
+      inclusive = true,
+      opts = {
+        labels = "",
+        safe_labels = vim.fn.mode(1):match'[no]' and '' or nil,
+      },
+    }
+    return vim.tbl_deep_extend('keep', common_args, key_specific_args)
+  end
+
+  local clever = require("leap.user").with_traversal_keys
+  local clever_f = clever("f", "F")
+  local celver_t = clever("t", "T")
+
+  for key, key_specific_args in pairs {
+    f = { opts = clever_f, },
+    F = { backwards = true, opts = clever_f, },
+    t = { opts = celver_t, },
+    T = { backwards = true, opts = celver_t, },
+  } do
+    vim.keymap.set({ "n", "x", "o" }, key, function ()
+      require("leap").leap(as_ft(key_specific_args))
+    end)
+  end
+end
+
+-- Custom filetypes
+--
+-- Github Actions
+vim.filetype.add({
+  pattern = {
+    [".*/%.github.com/workflows/.*%.ya?ml"] = "yaml.ghaction",
+    [".*/%.github/actions/.*/action%.ya?ml"] = "yaml.ghaction"
+  },
+})
+
+-- Copy visual selection as `file/path(line_number)`
+vim.keymap.set('v', '<leader>cf', function()
+  local start_line = vim.fn.getpos("'<")[2]
+  local end_line   = vim.fn.getpos("'>")[2]
+  local path = vim.fn.expand('%')
+  local ref = start_line == end_line
+    and (path .. '(' .. start_line .. ')')
+    or  (path .. '(' .. start_line .. '-' .. end_line .. ')')
+  vim.fn.setreg('+', ref)
+  vim.fn.setreg('"', ref)
+  vim.notify('Copied: ' .. ref, vim.log.levels.INFO)
+end, { desc = 'Copy file ref with line range' })

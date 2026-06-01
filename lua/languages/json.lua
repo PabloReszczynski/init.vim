@@ -12,9 +12,22 @@ function M.setup()
       on_attach = common.on_attach,
       capabilities = common.default_capabilities,
     })
+
+    vim.lsp.config("jsonls", {
+      on_attach = common.on_attach,
+      capabilities = common.default_capabilities,
+      settings = {
+        json = {
+          schemas = require("schemastore").json.schemas(),
+          validate = { enable = true },
+        }
+      }
+    })
+
     configured = true
   end
   vim.lsp.enable("biome")
+  --vim.lsp.enable("jsonls")
 end
 
 return M
